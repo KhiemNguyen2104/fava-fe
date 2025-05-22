@@ -1,80 +1,73 @@
-import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { useFonts } from 'expo-font';
-import { Stack } from 'expo-router';
-import * as SplashScreen from 'expo-splash-screen';
-import { useEffect, useState } from 'react';
-import 'react-native-reanimated';
-import { Slot, useRouter } from 'expo-router';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { View, ActivityIndicator } from 'react-native';
+// import * as React from 'react';
+// import FontAwesome from '@expo/vector-icons/FontAwesome';
+// import { Tabs } from 'expo-router';
+// import Colors from '@/constants/Colors';
+// import { useColorScheme } from '@/components/useColorScheme';
 
-import { useColorScheme } from '@/components/useColorScheme';
+// function TabBarIcon(props: {
+//   name: React.ComponentProps<typeof FontAwesome>['name'];
+//   color: string;
+// }) {
+//   return <FontAwesome size={28} style={{ marginBottom: -3 }} {...props} />;
+// }
 
-export {
-  // Catch any errors thrown by the Layout component.
-  ErrorBoundary,
-} from 'expo-router';
+// export default function TabLayout() {
+//   const colorScheme = useColorScheme();
 
-export const unstable_settings = {
-  // Ensure that reloading on `/modal` keeps a back button present.
-  initialRouteName: '(tabs)',
+//   return (
+//     <Tabs
+//       screenOptions={{
+//         tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
+//         headerShown: false,
+//       }}>
+//       <Tabs.Screen
+//         name="(tabs)/wardrobe"
+//         options={{
+//           title: 'wardrobe',
+//           headerShown: false,
+//           tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
+//         }}
+//       />
+//       <Tabs.Screen
+//         name="(tabs)/home"
+//         options={{
+//           title: 'home',
+//           headerShown: false,
+//           tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
+//         }}
+//       />
+//       <Tabs.Screen
+//         name="(tabs)/ai"
+//         options={{
+//           title: 'ai',
+//           headerShown: false,
+//           tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
+//         }}
+//       />
+
+//       <Tabs.Screen
+//         name="(tabs)/shopping"
+//         options={{
+//           title: 'shopping',
+//           headerShown: false,
+//           tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
+//         }}
+//       />
+//     </Tabs>
+//   );
+// }
+
+import React from "react";
+import { Slot } from "expo-router";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+
+// For other page except Sign In Page
+const AppLayout = () => {
+  return (
+    <GestureHandlerRootView>
+      <Slot />
+    </GestureHandlerRootView>
+  );
 };
 
-// Prevent the splash screen from auto-hiding before asset loading is complete.
-SplashScreen.preventAutoHideAsync();
-
-export default function RootLayout() {
-  const [loaded, error] = useFonts({
-    SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
-    ...FontAwesome.font,
-  });
-
-  // Expo Router uses Error Boundaries to catch errors in the navigation tree.
-  useEffect(() => {
-    if (error) throw error;
-  }, [error]);
-
-  useEffect(() => {
-    if (loaded) {
-      SplashScreen.hideAsync();
-    }
-  }, [loaded]);
-
-  if (!loaded) {
-    return null;
-  }
-
-  return <RootLayoutNav />;
-}
-
-
-
-function RootLayoutNav() {
-  const colorScheme = useColorScheme();
-  const router = useRouter();
-  const [isReady, setIsReady] = useState(false);
-
-  useEffect(() => {
-    const checkOnboarding = async () => {
-      const seen = await AsyncStorage.getItem('hasSeenOnboarding');
-      if (!seen) {
-        router.replace('/onboarding');
-        return;
-      }
-      setIsReady(true);
-    };
-    checkOnboarding();
-  }, []);
-
-
-  return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
-        <Stack.Screen name="onboarding" options={{ headerShown: false }} />
-      </Stack>
-    </ThemeProvider>
-  );
-}
+export default AppLayout;
