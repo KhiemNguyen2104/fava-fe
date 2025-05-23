@@ -1,9 +1,13 @@
-import { View, BackHandler, Alert } from "react-native";
-import React, { useEffect } from "react";
+import { TouchableOpacity, StyleSheet } from "react-native";
+import React from "react";
 import { Tabs } from "expo-router";
 import Icon from "react-native-vector-icons/FontAwesome6";
-import { useSegments } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
+import Header from "../../components/Header";
+import { useSegments } from "expo-router";
+
+const ACTIVE_COLOR = "#CC1766";
+const INACTIVE_COLOR = "#fff";
 
 const TabIcon = ({
   focused,
@@ -13,112 +17,65 @@ const TabIcon = ({
   iconName: string;
 }) => {
   return (
-    <View className="flex flex-col">
-      <Icon name={iconName} size={28} color={focused ? "#0061ff" : "#666876"} />
-    </View>
+    <Icon
+      name={iconName}
+      size={24}
+      color={focused ? ACTIVE_COLOR : INACTIVE_COLOR}
+    />
   );
 };
 
 const TabLayout = () => {
-  // const segments = useSegments();
-  // const segment = segments[2] || "";
-  // const segmentName = segment.charAt(0).toUpperCase() + segment.slice(1);
-
-  // const tabTitles: { [key: string]: string } = {
-  //   Home: "Home",
-  //   Ai: "Ai",
-  //   Shopping: "Shopping",
-  //   Wardrobe: "Wardrobe",
-  // };
-
-  // const currentRoute = segmentName;
-
-  // useEffect(() => {
-  //   const backAction = () => {
-  //     if (currentRoute === "Home") {
-  //       Alert.alert("Exit Smart Home", "Are you sure?", [
-  //         { text: "Cancel", onPress: () => null, style: "cancel" },
-  //         { text: "Exit", onPress: () => BackHandler.exitApp() },
-  //       ]);
-  //       return true;
-  //     }
-  //     return false;
-  //   };
-
-  //   const backHandler = BackHandler.addEventListener(
-  //     "hardwareBackPress",
-  //     backAction
-  //   );
-
-  //   return () => backHandler.remove();
-  // }, [currentRoute]);
-
-
+  const segments = useSegments();
 
   return (
-    <SafeAreaView style={{ flex: 1}}  edges={["bottom"]}>
-      {/* <Header title={currentTitle} /> */}
+    <SafeAreaView style={{ flex: 1 }} edges={['top', 'left', 'right']}>
+      <Header title={segments[1] ?? ""} />
       <Tabs
         screenOptions={{
           headerShown: false,
           tabBarShowLabel: false,
-          tabBarStyle: {
-            backgroundColor: "white",
-            alignItems: "center",
-            justifyContent: "center",
-            paddingBottom: 10,
-            paddingTop: 10,
-            height: 70,
-          },
-          tabBarItemStyle: {
-            alignItems: "center",
-            justifyContent: "center",
-          },
         }}
       >
-      <Tabs.Screen
-        name="wardrobe/index"
-        options={{
-          title: "Wardrobe",
-          headerShown: false,
-          tabBarIcon: ({ focused }) => (
-            <TabIcon focused={focused} iconName="box-archive" />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="home/index"
-        options={{
-          title: "Home",
-          headerShown: false,
-          tabBarIcon: ({ focused }) => (
-            <TabIcon focused={focused} iconName="house" />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="ai/index"
-        options={{
-          title: "AI",
-          headerShown: false,
-          tabBarIcon: ({ focused }) => (
-            <TabIcon focused={focused} iconName="star" />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="shopping/index"
-        options={{
-          title: "Shopping",
-          headerShown: false,
-          tabBarIcon: ({ focused }) => (
-            <TabIcon focused={focused} iconName="cart-shopping" />
-          ),
-        }}
-      />
+        {[
+          { name: "wardrobe/index", icon: "box-archive" },
+          { name: "home/index", icon: "house" },
+          { name: "ai/index", icon: "star" },
+          { name: "shopping/index", icon: "cart-shopping" },
+        ].map(({ name, icon }) => (
+          <Tabs.Screen
+            key={name}
+            name={name}
+            options={{
+              tabBarIcon: ({ focused }) => (
+                <TabIcon focused={focused} iconName={icon} />
+              ),
+              tabBarButton: (props) => {
+                const focused = segments[1] === name.split("/")[0];
+                return (
+                  <TouchableOpacity
+                    {...props}
+                    style={{
+                      ...styles.tabBarButton,
+                      backgroundColor: focused ? INACTIVE_COLOR : ACTIVE_COLOR,
+                    }}
+                  />
+                );
+              },
+            }}
+          />
+        ))}
       </Tabs>
     </SafeAreaView>
   );
 };
 
 export default TabLayout;
+
+
+const styles = StyleSheet.create({
+  tabBarButton: { flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  }
+});
