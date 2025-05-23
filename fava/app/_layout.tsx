@@ -60,6 +60,7 @@
 import React from "react";
 import { Slot } from "expo-router";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import './sentry.config'
 
 // For other page except Sign In Page
 const AppLayout = () => {
