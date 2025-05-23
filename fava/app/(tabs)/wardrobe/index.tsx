@@ -1,12 +1,14 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Image } from 'react-native';
 
 const AiTabScreen = () => {
     return (
         <View style={styles.container}>
             <Text style={styles.title}>Wardrobe Tab</Text>
             <Text>Welcome to the Wardrobe tab!</Text>
+
         </View>
+        
     );
 };
 
