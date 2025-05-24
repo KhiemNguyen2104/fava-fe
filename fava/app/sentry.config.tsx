@@ -6,3 +6,4 @@ Sentry.init({
   enabled: __DEV__,
   debug: true,
 });
+

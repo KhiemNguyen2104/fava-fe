@@ -35,6 +35,7 @@ const TabLayout = () => {
         screenOptions={{
           headerShown: false,
           tabBarShowLabel: false,
+          tabBarStyle:  styles.tabBarStyle ,
         }}
       >
         {[
@@ -77,5 +78,9 @@ const styles = StyleSheet.create({
   tabBarButton: { flex: 1,
     justifyContent: "center",
     alignItems: "center",
-  }
+  },
+  tabBarStyle: {
+    backgroundColor: "#000", // TODO: this is temporary, change to #CC1766 when succesfully implement immersive mode
+    height: "13%",
+  },
 });
