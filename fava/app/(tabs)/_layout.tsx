@@ -35,10 +35,11 @@ const TabLayout = () => {
         screenOptions={{
           headerShown: false,
           tabBarShowLabel: false,
+          tabBarStyle:  styles.tabBarStyle ,
         }}
       >
         {[
-          { name: "wardrobe/index", icon: "box-archive" },
+          { name: "wardrobe", icon: "box-archive" },
           { name: "home/index", icon: "house" },
           { name: "ai/index", icon: "star" },
           { name: "shopping/index", icon: "cart-shopping" },
@@ -52,13 +53,18 @@ const TabLayout = () => {
               ),
               tabBarButton: (props) => {
                 const focused = segments[1] === name.split("/")[0];
+                const filteredProps = Object.fromEntries(
+                  Object.entries(props).filter(([_, v]) => v !== null)
+                );
                 return (
                   <TouchableOpacity
-                    {...props}
-                    style={{
-                      ...styles.tabBarButton,
-                      backgroundColor: focused ? INACTIVE_COLOR : ACTIVE_COLOR,
-                    }}
+                    {...filteredProps}
+                    style={[
+                      props.style,
+                      styles.tabBarButton,
+                      { backgroundColor: focused ? INACTIVE_COLOR : ACTIVE_COLOR },
+                      { flex: 1}
+                    ]}
                   />
                 );
               },
@@ -74,8 +80,12 @@ export default TabLayout;
 
 
 const styles = StyleSheet.create({
-  tabBarButton: { flex: 1,
+  tabBarButton: { 
     justifyContent: "center",
     alignItems: "center",
-  }
+  },
+  tabBarStyle: {
+    backgroundColor: "#000", // TODO: this is temporary, change to #CC1766 when succesfully implement immersive mode
+    height: "14%",
+  },
 });
