@@ -80,10 +80,10 @@ const LocationsScreen = () => {
 
       <View style={styles.modalButtonRow}>
         <TouchableOpacity onPress={() => setModalVisible(false)} style={styles.modalButton}>
-          <Text>Hủy</Text>
+          <Text>Cancel</Text>
         </TouchableOpacity>
         <TouchableOpacity onPress={handleAddCity} style={styles.modalButton}>
-          <Text>Thêm</Text>
+          <Text>Add</Text>
         </TouchableOpacity>
       </View>
     </View>
