@@ -11,7 +11,7 @@ type CityWeatherCardProps = {
 const CityWeatherCard = ({ city = "London", range = "10 ~ 20 ℃", currentTemp = "18 ℃" } : CityWeatherCardProps) => {
   return (
     <LinearGradient
-      colors={['#4A90E2', '#B3E5FC']}
+      colors={['#124BAD', '#9BD4FF']}
       start={{ x: 0, y: 0.5 }}
       end={{ x: 1, y: 0.5 }}
       style={styles.container}
