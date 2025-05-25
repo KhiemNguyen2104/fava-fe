@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, Image, ScrollView } from 'react-native';
 import RecommendationBar from '../../../components/RecommendationBar';
 import ItemCard from './../../../components/ItemCard';
+import { useRouter } from 'expo-router';
 
 const itemCardData = [
   {
@@ -31,8 +32,8 @@ const itemCardData = [
 ];
 
 const WardrobeTabScreen = () => {
-    
-    const categories = ['Pants', 'T-shirt', 'Coat', 'Shoes', 'Hat'];
+    const router = useRouter();
+    const categories = ['Pants', 'T-shirt', 'Coat', 'Shoes', 'Hat']; 
 
     return (
         <View style={styles.container}>
@@ -45,7 +46,16 @@ const WardrobeTabScreen = () => {
                 image={item.image}
                 name={item.name}
                 label={item.label}
-                size={item.size}
+                size={item.size} 
+                onPress={() => router.push({
+                  pathname: '/(tabs)/wardrobe/detail',
+                  params: {
+                    image: item.image,
+                    name: item.name,
+                    label: item.label,
+                    size: item.size,
+                  },
+                })}
                 />
             ))}
             </ScrollView>

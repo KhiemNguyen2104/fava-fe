@@ -1,21 +1,25 @@
 import React from 'react';
-import { View, Text, Image, StyleSheet } from 'react-native';
+import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
 
 type ItemCardProps = {
-  image: any; // Use `require()` or a URI for the image
+  image: any; 
   name: string;
   label: string;
   size: string;
+  onPress?: () => void; 
 };
 
-const ItemCard: React.FC<ItemCardProps> = ({ image, name, label, size }) => {
+const ItemCard: React.FC<ItemCardProps> = ({ image, name, label, size, onPress }) => {
   return (
-    <View style={styles.card}>
-      <Image source={image} style={styles.image} resizeMode="contain" />
-      <Text style={styles.name}>{name}</Text>
-      <Text style={styles.label}>Label: {label}</Text>
-      <Text style={styles.label}>Size: {size}</Text>
-    </View>
+    <TouchableOpacity onPress={onPress} activeOpacity={0.8}>
+      <View style={styles.card}>
+        <Image source={image} style={styles.image} resizeMode="contain" />
+        <Text style={styles.name}>{name}</Text>
+        <Text style={styles.label}>Label: {label}</Text>
+        <Text style={styles.label}>Size: {size}</Text>
+      </View>
+    </TouchableOpacity>
+
   );
 };
 

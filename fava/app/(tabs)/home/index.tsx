@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { ScrollView, View, Text, StyleSheet } from 'react-native';
 import EnvironmentInfo from '../../../components/EnvironmentInfo';
 import ItemCard from './../../../components/ItemCard';
+import { useRouter } from 'expo-router';
 
 const weatherAPIKey = process.env.EXPO_PUBLIC_WEATHER_API_KEY;
 const itemCardData = [
@@ -62,6 +63,7 @@ const HomeScreen = () => {
         fetchWeather();
     }, []);
 
+    const router = useRouter();
   return (
     <ScrollView style={{ backgroundColor: '#fff' }}>
         <EnvironmentInfo
@@ -79,6 +81,15 @@ const HomeScreen = () => {
             name={item.name}
             label={item.label}
             size={item.size}
+            onPress={() => router.push({
+              pathname: '/(tabs)/wardrobe/detail',
+              params: {
+                image: "../../../assets/images/placeholder_big.png",
+                name: item.name,
+                label: item.label,
+                size: item.size,
+              },
+            })}
             />
         ))}
         </ScrollView>

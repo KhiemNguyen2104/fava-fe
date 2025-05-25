@@ -1,47 +1,92 @@
-import React from "react";
-import { View, Text, TouchableOpacity, StyleSheet, Image } from "react-native";
+import React, { useState, useRef } from "react";
+import { View, TouchableOpacity, StyleSheet, Image, Dimensions, Animated } from "react-native";
 import Icon from "react-native-vector-icons/Feather";
-import { useRouter } from "expo-router";
 import SearchBar from "./SearchBar";
+import SideMenu from "./SideMenu";
 
 interface HeaderProps {
   title: string;
 }
 
+const screenWidth = Dimensions.get('window').width;
+const screenHeight = Dimensions.get('window').height;
+
 const Header: React.FC<HeaderProps> = ({ title }) => {
-    const router = useRouter();
     const handleSearch = (keyword: string) => {
-        // Handle search logic here
+        // TODO: Handle search logic here
         console.log("Search keyword:", keyword);
     }
 
+    const translateX = useRef(new Animated.Value(-screenWidth)).current;
+    const [menuVisible, setMenuVisible] = useState(false);
 
-  if (title != "Home") {
-    return (
-      <View style={styles.header}>
-        
-        <TouchableOpacity onPress={() => console.log("Open List")}>
-          <View >
-            <Image
-                source={require('../assets/images/placeholder.png')}
-                style={styles.avatar}
-            />
-          </View>
-        </TouchableOpacity>
+    const toggleMenu = () => {
+      const toValue = menuVisible ? -screenWidth : 0;
+      setMenuVisible(!menuVisible);
 
-        <SearchBar onSearch={()=> {}}/>
+      Animated.timing(translateX, {
+        toValue,
+        duration: 250,
+        useNativeDriver: true,
+      }).start(() => {
+        console.log(menuVisible ? "Menu closed" : "Menu opened");
+      });
+    };
 
-        <TouchableOpacity onPress={() => handleSearch("~~In Progress~~")}>
-          <Icon name="search" size={35} style={styles.icon} />
-        </TouchableOpacity>
+  return (
+    <View style={styles.header}>
+      
+      <TouchableOpacity onPress={toggleMenu}>
+        <View >
+          <Image
+              source={require('../assets/images/placeholder.png')}
+              style={styles.avatar}
+          />
+        </View>
+      </TouchableOpacity>
 
-      </View>
-    );
-  }
-  return <View></View>;
-};
+      <SearchBar onSearch={()=> {}}/>
+
+      <TouchableOpacity onPress={() => handleSearch("~~In Progress~~")}>
+        <Icon name="search" size={35} style={styles.icon} />
+      </TouchableOpacity>
+
+      <Animated.View
+        style={[
+          styles.animatedMenu,
+          { height: screenHeight },
+          { transform: [{ translateX }] }
+        ]}
+        pointerEvents={menuVisible ? "auto" : "none"}
+      >
+        <TouchableOpacity
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: screenWidth,
+            height: '100%',
+            backgroundColor: 'rgba(0,0,0,0.3)',
+          }}
+          activeOpacity={1}
+          onPress={toggleMenu}
+        />
+        <SideMenu onClose={toggleMenu} />
+      </Animated.View>
+
+    </View>
+  );
+  };
 
 const styles = StyleSheet.create({
+  animatedMenu: {
+    position: 'absolute',
+    top: 0,
+    bottom: 0,
+    left: 0,
+    width: '100%',
+    zIndex: 10,
+  },
   header: {
     flexDirection: "row",
     alignItems: "center",
@@ -62,7 +107,6 @@ const styles = StyleSheet.create({
     width: 35,
     height: 35,
     borderRadius: 17.5,
-
   }
 });
 
