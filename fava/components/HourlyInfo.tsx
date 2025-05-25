@@ -13,7 +13,7 @@ type HourlyInfoProps = {
 const HourlyInfo: React.FC<HourlyInfoProps> = ({  height = 130, width = 70, temperature, hour, icon = 'partly-sunny-outline' }) => {
   return (
     <LinearGradient
-      colors={['#1E88E5', '#90CAF9']}
+      colors={['#124BAD', '#9BD4FF']}
       start={{ x: 0.5, y: 0 }}
       end={{ x: 0.5, y: 1 }}
       style={[styles.container, { height, width }]}
