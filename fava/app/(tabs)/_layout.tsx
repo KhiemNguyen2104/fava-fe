@@ -40,7 +40,7 @@ const TabLayout = () => {
       >
         {[
           { name: "wardrobe", icon: "box-archive" },
-          { name: "home/index", icon: "house" },
+          { name: "home", icon: "house" },
           { name: "ai/index", icon: "star" },
           { name: "shopping/index", icon: "cart-shopping" },
         ].map(({ name, icon }) => (

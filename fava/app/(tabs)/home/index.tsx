@@ -1,8 +1,8 @@
 import React, { useEffect } from 'react';
-import { ScrollView, View, Text, StyleSheet } from 'react-native';
+import { ScrollView, View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import EnvironmentInfo from '../../../components/EnvironmentInfo';
 import ItemCard from './../../../components/ItemCard';
-import { useRouter } from 'expo-router';
+import { Route, RouteParams, useRouter } from 'expo-router';
 
 const weatherAPIKey = process.env.EXPO_PUBLIC_WEATHER_API_KEY;
 const itemCardData = [
@@ -66,12 +66,14 @@ const HomeScreen = () => {
     const router = useRouter();
   return (
     <ScrollView style={{ backgroundColor: '#fff' }}>
-        <EnvironmentInfo
-            weatherIcon={environmentInfo.weatherIcon}
-            temperature={environmentInfo.temperature}
-            humidity={environmentInfo.humidity}
-            location={environmentInfo.location}
-        />
+        <TouchableOpacity onPress={() => router.push( '/(tabs)/home/environment' as Route)}>
+          <EnvironmentInfo
+              weatherIcon={environmentInfo.weatherIcon}
+              temperature={environmentInfo.temperature}
+              humidity={environmentInfo.humidity}
+              location={environmentInfo.location}
+          />
+        </TouchableOpacity>
         <Text style={styles.title}>Shopping suggestion</Text>
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.suggestionContainer}>
         {itemCardData.map((item, index) => (
