@@ -11,13 +11,15 @@ export default function SideMenu({ onClose }: Props) {
   const router = useRouter();
   return (
     <View style={styles.menu}>
-      {['Profile', 'Wardrobe', 'AI suggestion', 'Shopping'].map((item, index) => (
+      {['Profile', 'Wardrobe', 'Home', 'AI suggestion', 'Shopping'].map((item, index) => (
         <TouchableOpacity key={index} style={styles.item} 
           onPress={
             () => {
               onClose(); 
               if (item === 'Profile') {
-                router.push('/(tabs)/home'); // TODO: Assuming home is the profile page, change to the actual profile page later
+                router.push('/(tabs)/home/profile'); // TODO: Assuming home is the profile page, change to the actual profile page later
+              } else if (item === 'Home') {
+                router.push('/(tabs)/home');
               } else if (item === 'Wardrobe') {
                 router.push('/(tabs)/wardrobe');
               } else if (item === 'AI suggestion') {

@@ -8,6 +8,7 @@ import InformationRow from '../../../components/InformationRow';
 const ItemDetailScreen = ({}) => {
   const { image, name, label, size } = useLocalSearchParams();
   const tempImage = require('../../../assets/images/placeholder_big.png'); 
+
   return (
     <View style={styles.container}>
       <Image source={ tempImage } style={styles.image} /> 
@@ -23,13 +24,6 @@ const ItemDetailScreen = ({}) => {
       
       
       <View style={styles.buttonRow}>
-        <RectButton
-          title="Remove"
-          buttonColor="#FF4242"
-          width={120}
-          height={50}
-          onPress={() => console.log('Remove pressed')}
-        />
         <CircleBurron
           iconName="arrow-left"
           buttonColor="#C2185B"
@@ -37,13 +31,20 @@ const ItemDetailScreen = ({}) => {
           height={50}
           onPress={() => router.back()}
         />
+        <RectButton
+          title="Remove"
+          buttonColor="#FF4242"
+          width={120}
+          height={50}
+          onPress={() => console.log('Remove pressed')}
+        />
       </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, alignItems: 'center', justifyContent: 'center' },
+  container: { flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: '#fff' },
   image: { width: "80%", height: "35%", marginBottom: 10, borderBottomWidth: 2, borderBottomColor: '#000' },
   name: { fontSize: 24, fontWeight: 'bold', margin: 10, paddingBottom: 5 },
   label: { fontSize: 18, margin: 5 },

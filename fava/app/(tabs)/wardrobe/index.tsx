@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, Image, ScrollView } from 'react-native';
 import RecommendationBar from '../../../components/RecommendationBar';
 import ItemCard from './../../../components/ItemCard';
 import { useRouter } from 'expo-router';
+import CircleButton from '../../../components/CircleButton';
 
 const itemCardData = [
   {
@@ -60,6 +61,15 @@ const WardrobeTabScreen = () => {
             ))}
             </ScrollView>
 
+          <View style={styles.addButtonContainer}>
+            <CircleButton
+              iconName="plus"
+              buttonColor="#C2185B"
+              width={50}
+              height={50}
+              onPress={() => router.push('/(tabs)/wardrobe/addItem')}
+            />
+          </View>
         </View>
         
     );
@@ -79,6 +89,12 @@ const styles = StyleSheet.create({
     suggestionContainer: {
         paddingHorizontal: 10,
         marginTop: 10,
+    },
+    addButtonContainer: {
+      position: 'absolute',   
+      right: 20,
+      bottom: 40,
+      zIndex: 10,
     },
 });
 
