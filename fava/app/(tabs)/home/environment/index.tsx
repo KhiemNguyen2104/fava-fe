@@ -8,7 +8,7 @@ import {
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import HourlyInfo from '../../../../components/HourlyInfo'; 
-import CircleBurron from '../../../../components/CircleButton';
+import CircleButton from '../../../../components/CircleButton';
 import { useRouter } from 'expo-router';
 
 export default function WeatherScreen() {
@@ -65,7 +65,7 @@ export default function WeatherScreen() {
 
       {/* Back Button */}
       <View style={styles.backButton}>
-        <CircleBurron
+        <CircleButton
             iconName="arrow-left"
             buttonColor="#C2185B"
             width={50}

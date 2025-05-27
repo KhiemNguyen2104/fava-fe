@@ -17,7 +17,7 @@ export default function SideMenu({ onClose }: Props) {
             () => {
               onClose(); 
               if (item === 'Profile') {
-                router.push('/(tabs)/home/profile'); // TODO: Assuming home is the profile page, change to the actual profile page later
+                router.push('/profile'); // TODO: Assuming home is the profile page, change to the actual profile page later
               } else if (item === 'Home') {
                 router.push('/(tabs)/home');
               } else if (item === 'Wardrobe') {

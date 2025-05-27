@@ -6,7 +6,6 @@ const EnvironmentLayout = () => {
     <Stack screenOptions={{ headerShown: false }}>
         <Stack.Screen name="index" />
         <Stack.Screen name="environment" />
-        <Stack.Screen name="profile" />
     </Stack>
   );
 };
