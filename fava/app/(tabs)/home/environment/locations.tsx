@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, ScrollView, Modal, TouchableOpacity, TextInput 
 import CityWeatherCard from '@/components/CityWeatherCard';
 import CircleButton from '@/components/CircleButton';
 import { useRouter } from 'expo-router';
+import CustomModal from '@/components/CustomModal';
 
 const cityWeatherData = [
   { id: '1', city: 'London', range: '10 ~ 20 ℃', currentTemp: '18 ℃' },
@@ -60,35 +61,22 @@ const LocationsScreen = () => {
 
 
 
-<Modal
-  visible={modalVisible}
-  transparent
-  animationType="fade"
-  onRequestClose={() => setModalVisible(false)}
->
-  <View style={styles.modalOverlay}>
-    <View style={styles.modalContent}>
-      <View style={styles.row}>
-        <Text style={styles.label}>City:</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="City Name"
-          value={newCity}
-          onChangeText={setNewCity}
+        <CustomModal
+          visible={modalVisible}
+          onRequestClose={() => setModalVisible(false)}
+          fields={[
+            {
+              label: 'City:',
+              placeholder: 'City Name',
+              value: newCity,
+              onChangeText: setNewCity,
+            },
+          ]}
+          actions={[
+            { label: 'Cancel', onPress: () => setModalVisible(false) },
+            { label: 'Add', onPress: handleAddCity },
+          ]}
         />
-      </View>
-
-      <View style={styles.modalButtonRow}>
-        <TouchableOpacity onPress={() => setModalVisible(false)} style={styles.modalButton}>
-          <Text>Cancel</Text>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={handleAddCity} style={styles.modalButton}>
-          <Text>Add</Text>
-        </TouchableOpacity>
-      </View>
-    </View>
-  </View>
-</Modal>
 
 
 
