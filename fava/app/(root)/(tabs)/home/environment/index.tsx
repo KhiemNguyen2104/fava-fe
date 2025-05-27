@@ -7,8 +7,8 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import HourlyInfo from '../../../../components/HourlyInfo'; 
-import CircleButton from '../../../../components/CircleButton';
+import HourlyInfo from '@/components/HourlyInfo'; 
+import CircleButton from '@/components/CircleButton';
 import { useRouter } from 'expo-router';
 
 export default function WeatherScreen() {
@@ -27,7 +27,7 @@ export default function WeatherScreen() {
       {/* Header */}
       <View style={styles.header}>
         <Text style={styles.city}>Ho Chi Minh</Text>
-        <TouchableOpacity onPress={() => router.push('/(tabs)/home/environment/locations')}>
+        <TouchableOpacity onPress={() => router.push('/(root)/(tabs)/home/environment/locations')}>
           <MaterialCommunityIcons name="file-document-outline" size={35} color="black" />
         </TouchableOpacity>
       </View>

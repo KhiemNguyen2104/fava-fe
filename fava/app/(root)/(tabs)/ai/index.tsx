@@ -1,35 +1,35 @@
 import React, { useState } from 'react';
 import { Alert, View, Text, TextInput, Image, TouchableOpacity, StyleSheet, ImageBackground } from 'react-native';
-import RectButton from '../../../components/RectangleButton';
+import RectButton from '@/components/RectangleButton';
 import { useRouter } from 'expo-router';
 import { ScrollView } from 'react-native-gesture-handler';
 import CustomModal from '@/components/CustomModal';
 import ClothingPickerModal from '@/components/ClothingModal';
 import ScreenDivider from '@/components/ScreenDivider';
-import ItemCard from '../../../components/ItemCard';
+import ItemCard from '@/components/ItemCard';
 import PurposePickerModal from '@/components/PurposePickerModal';
 
 const itemCardData = [
   {
-    image: require('../../../assets/images/placeholder_big.png'),
+    image: require('@/assets/images/placeholder_big.png'),
     name: "T1 Jacket Faker",
     label: "",
     size: "XL",
   },
   {
-    image: require('../../../assets/images/placeholder_big.png'),
+    image: require('@/assets/images/placeholder_big.png'),
     name: "T1 Jacket Faker",
     label: "",
     size: "L",
   },
     {
-    image: require('../../../assets/images/placeholder_big.png'),
+    image: require('@/assets/images/placeholder_big.png'),
     name: "T1 Jacket Faker",
     label: "",
     size: "L",
   },
     {
-    image: require('../../../assets/images/placeholder_big.png'),
+    image: require('@/assets/images/placeholder_big.png'),
     name: "T1 Jacket Faker",
     label: "",
     size: "L",
@@ -214,7 +214,7 @@ export default function AddItem() {
               label={item.label}
               size={item.size}
               onPress={() => router.push({
-                pathname: '/(tabs)/wardrobe/detail',
+                pathname: '/(root)/(tabs)/wardrobe/detail',
                 params: {
                   image: item.image,
                   name: item.name,

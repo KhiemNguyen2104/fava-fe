@@ -1,31 +1,31 @@
 import React, { useEffect } from 'react';
 import { ScrollView, View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import EnvironmentInfo from '../../../components/EnvironmentInfo';
-import ItemCard from './../../../components/ItemCard';
+import EnvironmentInfo from '@/components/EnvironmentInfo';
+import ItemCard from '@/components/ItemCard';
 import { Route, RouteParams, useRouter } from 'expo-router';
 
 const weatherAPIKey = process.env.EXPO_PUBLIC_WEATHER_API_KEY;
 const itemCardData = [
   {
-    image: require('../../../assets/images/placeholder_big.png'),
+    image: require('@/assets/images/placeholder_big.png'),
     name: "T1 Jacket Faker",
     label: "",
     size: "XL",
   },
   {
-    image: require('../../../assets/images/placeholder_big.png'),
+    image: require('@/assets/images/placeholder_big.png'),
     name: "T1 Jacket Faker",
     label: "",
     size: "L",
   },
     {
-    image: require('../../../assets/images/placeholder_big.png'),
+    image: require('@/assets/images/placeholder_big.png'),
     name: "T1 Jacket Faker",
     label: "",
     size: "L",
   },
     {
-    image: require('../../../assets/images/placeholder_big.png'),
+    image: require('@/assets/images/placeholder_big.png'),
     name: "T1 Jacket Faker",
     label: "",
     size: "L",
@@ -84,9 +84,9 @@ const HomeScreen = () => {
             label={item.label}
             size={item.size}
             onPress={() => router.push({
-              pathname: '/(tabs)/wardrobe/detail',
+              pathname: '/(root)/(tabs)/wardrobe/detail',
               params: {
-                image: "../../../assets/images/placeholder_big.png",
+                image: "@/assets/images/placeholder_big.png",
                 name: item.name,
                 label: item.label,
                 size: item.size,

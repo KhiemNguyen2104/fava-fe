@@ -36,7 +36,7 @@ const PurposePickerModal = ({ visible, onClose, onSelect } : PurposePickerModalP
   };
 
   return (
-    <Modal visible={visible} animationType="slide" transparent>
+    <Modal visible={visible} animationType="fade" transparent>
     <TouchableWithoutFeedback onPress={onClose}>
       <View style={styles.modalBackground}>
         <View style={styles.modalContainer}>

@@ -1,13 +1,13 @@
 import React from 'react';
 import { View, Text, Image, StyleSheet } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
-import RectButton from "../../../components/RectangleButton";
-import CircleBurron from "../../../components/CircleButton"; 
-import InformationRow from '../../../components/InformationRow';
+import RectButton from "@/components/RectangleButton";
+import CircleBurron from "@/components/CircleButton"; 
+import InformationRow from '@/components/InformationRow';
 
 const ItemDetailScreen = ({}) => {
   const { image, name, label, size } = useLocalSearchParams();
-  const tempImage = require('../../../assets/images/placeholder_big.png'); 
+  const tempImage = require('@/assets/images/placeholder_big.png'); 
 
   return (
     <View style={styles.container}>
