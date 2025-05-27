@@ -1,11 +1,15 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Image, TouchableOpacity, StyleSheet, ImageBackground } from 'react-native';
+import { Alert, View, Text, TextInput, Image, TouchableOpacity, StyleSheet, ImageBackground } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import Icon from "react-native-vector-icons/FontAwesome6";
 import RectButton from '../../../components/RectangleButton';
 import CircleBurron from '../../../components/CircleButton';
 import { useRouter } from 'expo-router';
 import { ScrollView } from 'react-native-gesture-handler';
+import CustomModal from '@/components/CustomModal';
+import ClothingPickerModal from '@/components/ClothingModal';
+import ScreenDivider from '@/components/ScreenDivider';
+import PurposePickerModal from '@/components/PurposePickerModal';
 
 const transparentBg = require('../../../assets/images/transparent-bg.jpg'); 
 
@@ -15,9 +19,25 @@ export default function AddItem() {
   const [type, setType] = useState('');
   const [label, setLabel] = useState('');
   const [size, setSize] = useState('');
-  const [temperature, setTemperature] = useState('');
   const [purpose, setPurpose] = useState('');
   const router = useRouter();
+
+  const [temperatureModalVisible, setTemperatureModalVisible] = useState(false);
+  const [temperatureFrom, setTemperatureFrom] = useState('');
+  const [temperatureTo, setTemperatureTo] = useState('');
+
+  const [clothingModalVisible, setClothingModalVisible] = useState(false);
+  const [clothingSelectedItem, setClothingSelectedItem] = useState<string | null>(null);
+
+  const [purposeModalVisible, setPurposeModalVisible] = useState(false);
+  const [purposes, setPurposes] = useState<string[]>([]);
+
+  const handleAddPurpose = (purpose: string) => {
+    if (purpose && !purposes.includes(purpose)) {
+      setPurposes([...purposes, purpose]);
+    }
+    setPurpose(purpose); 
+  };
 
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -71,7 +91,7 @@ export default function AddItem() {
       </View>
 
       
-      <View style={styles.divider} />  
+      <ScreenDivider  />  
       
       
       <TextInput style={styles.nameInput} placeholder="Name" value={name} onChangeText={setName} />
@@ -80,8 +100,27 @@ export default function AddItem() {
       <View style={styles.form}>        
         <View style={styles.inputRow}>
             <Text style={styles.label}>Type:</Text>
-            <TextInput style={styles.input} placeholder="Pants, skirt, ..." value={type} onChangeText={setType} />
+             <TouchableOpacity
+              style={[styles.input, { justifyContent: 'center' }]}
+              onPress={() => setClothingModalVisible(true)}
+            >
+              <Text  style={{ color: clothingSelectedItem ? '#222' : '#666' }}>
+                { clothingSelectedItem
+                  ? `${clothingSelectedItem}`
+                  : 'Select Type'}
+              </Text>
+            </TouchableOpacity>
         </View>
+        {/* Modal for selecting clothing type */}
+          <ClothingPickerModal
+            visible={clothingModalVisible}
+            onSelect={(item) => {
+              setType(item);
+              setClothingSelectedItem(item);
+              setClothingModalVisible(false);
+            }}
+            onClose={() => setClothingModalVisible(false)}
+          />
 
         <View style={styles.inputRow}>
             <Text style={styles.label}>Label:</Text>
@@ -94,14 +133,79 @@ export default function AddItem() {
         </View>
 
         <View style={styles.inputRow}>
-            <Text style={styles.label}>Temperature:</Text>
-            <TextInput style={styles.input} placeholder="25 - 30" value={temperature} onChangeText={setTemperature} />
+          <Text style={styles.label}>Temperature:</Text>
+          <TouchableOpacity
+            style={[styles.input, { justifyContent: 'center' }]}
+            onPress={() => setTemperatureModalVisible(true)}
+          >
+            <Text  style={{ color: (temperatureFrom && temperatureTo) ? '#222' : '#666' }}>
+              {temperatureFrom && temperatureTo
+                ? `${temperatureFrom} - ${temperatureTo}`
+                : 'From - To'}
+            </Text>
+          </TouchableOpacity>
         </View>
+        {/* Modal for adding temperature */}
+        <CustomModal
+          visible={temperatureModalVisible}
+          onRequestClose={() => setTemperatureModalVisible(false)}
+          fields={[
+            {
+              label: 'From:',
+              placeholder: 'Temperature',
+              value: temperatureFrom,
+              onChangeText: setTemperatureFrom,
+            },
+            {
+              label: 'To:',
+              placeholder: 'Temperature',
+              value: temperatureTo,
+              onChangeText: setTemperatureTo,
+            },
+          ]}
+          actions={[
+            { label: 'Cancel', onPress: () => setTemperatureModalVisible(false) },
+            {
+              label: 'OK',
+              onPress: () => {
+                // Kiểm tra phải là số
+                if (
+                  !/^\d+(\.\d+)?$/.test(temperatureFrom) ||
+                  !/^\d+(\.\d+)?$/.test(temperatureTo)
+                ) {
+                  Alert.alert('Error', 'Please enter valid value for temperature (number).');
+                  return;
+                }
+                // Kiểm tra from < to
+                if (parseFloat(temperatureFrom) >= parseFloat(temperatureTo)) {
+                  Alert.alert('Error', '"From" must be lower than "To".');
+                  return;
+                }
+                setTemperatureModalVisible(false);
+              },
+            },
+          ]}
+        />
 
         <View style={styles.inputRow}>         
-            <Text style={styles.label}>Purpose:</Text>
-            <TextInput style={styles.input} placeholder="Work, Go out" value={purpose} onChangeText={setPurpose} />
+          <Text style={styles.label}>Purpose:</Text>
+          <TouchableOpacity
+              style={[styles.input, { justifyContent: 'center' }]}
+              onPress={() => setPurposeModalVisible(true)}
+             >
+              <Text  style={{ color: purpose ? '#111' : '#666' }}>
+                { purpose
+                  ? `${purpose}`
+                  : 'Work, Go out, Party,...'}
+              </Text>
+            </TouchableOpacity>
         </View>
+          {/* Modal for selecting purpose */}
+          <PurposePickerModal
+                visible={purposeModalVisible}
+                onClose={() => setPurposeModalVisible(false)}
+                onSelect={handleAddPurpose}
+              />        
                 
       </View>
       
@@ -223,12 +327,5 @@ const styles = StyleSheet.create({
     marginTop: 20,
     paddingHorizontal: 20,
     paddingBottom: 40,
-  },
-    divider: {
-    height: 1,
-    backgroundColor: '#E0E0E0',
-    width: '100%',
-    alignSelf: 'center',
-    marginTop: 5,
   },
 });
