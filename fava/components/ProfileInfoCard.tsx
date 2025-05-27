@@ -34,13 +34,13 @@ const styles = StyleSheet.create({
   },
   title: {
     fontWeight: 'bold',
-    fontSize: 15,
+    fontSize: 18,
     color: '#d4006b',
-    marginBottom: 8,
+    marginBottom: 10,
   },
   row: {
-    fontSize: 15,
-    marginBottom: 5,
+    fontSize: 18,
+    marginBottom: 10,
   },
   label: {
     fontWeight: 'bold',

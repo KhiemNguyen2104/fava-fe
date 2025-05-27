@@ -2,9 +2,15 @@ import React, { useState } from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { Ionicons } from '@expo/vector-icons';
-import ProfileInfoCard from '../../../components/ProfileInfoCard'; 
+import ProfileInfoCard from '../components/ProfileInfoCard'; 
+import CircleButton from '../components/CircleButton'; 
+import { useRouter } from 'expo-router';
+
+const gradientPlaceholder = require('../assets/images/gradient-placeholder.jpg');
+const avatarPlaceholder = require('../assets/images/avatar-placeholder.png');
 
 export default function ProfileScreen() {
+  const router = useRouter();
   const [avatar, setAvatar] = useState<string | null>(null);
 
   const pickImage = async () => {
@@ -21,22 +27,30 @@ export default function ProfileScreen() {
     <View style={styles.container}>
       {/* Header with Gear Icon */}
       <View style={styles.header}>
+        <Image
+          source={gradientPlaceholder}
+          style={{ width: '100%', height: '100%' }}
+        />
         <TouchableOpacity style={styles.gearIcon}>
-          <Ionicons name="settings-sharp" size={26} color="#d4006b" />
+          <Ionicons name="settings-sharp" size={40} color="#d4006b" />
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.headerCameraIcon} onPress={pickImage}>
+          <Ionicons name="camera" size={24} color="white" />
         </TouchableOpacity>
       </View>
 
       {/* Avatar Section */}
       <View style={styles.avatarContainer}>
         <Image
-          source={avatar ? { uri: avatar } : require('../../../assets/images/placeholder.png')}
+          source={avatar ? { uri: avatar } : avatarPlaceholder}
           style={styles.avatar}
         />
         <TouchableOpacity style={styles.avatarCamera} onPress={pickImage}>
-          <Ionicons name="camera" size={18} color="white" />
+          <Ionicons name="camera" size={24} color="white" />
         </TouchableOpacity>
-        <Text style={styles.username}>Phuc Gia Khiem Nguyen</Text>
       </View>
+
+      <Text style={styles.username}>Phuc Gia Khiem Nguyen</Text>
 
       {/* Info Card */}
       <View style={styles.card}>
@@ -58,9 +72,15 @@ export default function ProfileScreen() {
       </View>
 
       {/* Back Button */}
-      <TouchableOpacity style={styles.backButton}>
-        <Ionicons name="arrow-back" size={26} color="white" />
-      </TouchableOpacity>
+      <View style={styles.backButton}>
+        <CircleButton  
+          iconName="arrow-left"
+          buttonColor="#C2185B"
+          width={60}
+          height={60}
+          onPress={() => router.back()} 
+        />
+      </View>
     </View>
   );
 }
@@ -70,21 +90,25 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
   },
   header: {
-    height: "25%",
-    backgroundColor: 'black',
+    height: "30%",
     justifyContent: 'flex-end',
   },
   gearIcon: {
     position: 'absolute',
-    top: 40,
-    right: 20,
-    backgroundColor: 'white',
-    padding: 10,
-    borderRadius: 20,
+    top: 50,
+    right: "5%",
+  },
+  headerCameraIcon: {
+    position: 'absolute',
+    bottom: "5%",
+    right: '5%',
+    backgroundColor: '#d4006b',
+    padding: 7,
+    borderRadius: 100,
   },
   avatarContainer: {
     alignItems: 'center',
-    marginTop: -40,
+    marginTop: "-20%",
   },
   avatar: {
     width: 150,
@@ -95,16 +119,18 @@ const styles = StyleSheet.create({
   },
   avatarCamera: {
     position: 'absolute',
-    bottom: "20%",
-    right: '37%',
+    bottom: "0%",
+    right: '35%',
     backgroundColor: '#d4006b',
-    padding: 10,
+    padding: 7,
     borderRadius: 100,
   },
   username: {
-    marginTop: 10,
-    fontSize: 18,
+    marginTop: 20,
+    marginBottom: 10,
+    fontSize: 24,
     fontWeight: 'bold',
+    textAlign: 'center',
   },
   card: {
     marginTop: 20,
@@ -126,10 +152,7 @@ const styles = StyleSheet.create({
   },
   backButton: {
     position: 'absolute',
-    bottom: 20,
-    right: 20,
-    backgroundColor: '#d4006b',
-    padding: 12,
-    borderRadius: 30,
+    bottom: "6%",
+    left: "13%",
   },
 });
