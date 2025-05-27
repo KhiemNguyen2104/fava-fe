@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import { Alert, View, Text, TextInput, Image, TouchableOpacity, StyleSheet, ImageBackground } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import Icon from "react-native-vector-icons/FontAwesome6";
-import RectButton from '../../../components/RectangleButton';
-import CircleBurron from '../../../components/CircleButton';
+import RectButton from '@/components/RectangleButton';
+import CircleBurron from '@/components/CircleButton';
 import { useRouter } from 'expo-router';
 import { ScrollView } from 'react-native-gesture-handler';
 import CustomModal from '@/components/CustomModal';
@@ -11,7 +11,7 @@ import ClothingPickerModal from '@/components/ClothingModal';
 import ScreenDivider from '@/components/ScreenDivider';
 import PurposePickerModal from '@/components/PurposePickerModal';
 
-const transparentBg = require('../../../assets/images/transparent-bg.jpg'); 
+const transparentBg = require('@/assets/images/transparent-bg.jpg'); 
 
 export default function AddItem() {
   const [name, setName] = useState('');

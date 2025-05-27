@@ -1,21 +1,44 @@
 import React from "react";
-import { Slot } from "expo-router";
-import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { View } from "react-native";
-import { StatusBar } from "expo-status-bar";
+import { useEffect, useState } from "react";
+import { Stack } from "expo-router";
 
 
-const AppLayout = () => {
-  // TODO: Hide the status bar and the navigation bar (immersive mode)
-  // Now tempoprarily let: "backgroundColor: "#000"" and hidden={false} in StatusBar
+export default function RootLayout() {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  console.log(isLoggedIn);
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
-      <View style={{ flex: 1, backgroundColor: "#000" }}>
-        <StatusBar hidden={false} /> 
-        <Slot />
-      </View>
-    </GestureHandlerRootView>
+      <Stack screenOptions={{ headerShown: false }}>
+        {isLoggedIn ? (
+          <>
+            <Stack.Screen 
+              name="(tabs)/wardrobe" 
+              options={{ headerShown: false }} 
+            />
+            <Stack.Screen
+              name="(tabs)/home"
+              options={{ headerShown: false }}
+            />
+            <Stack.Screen
+              name="(tabs)/ai"
+              options={{ headerShown: false }}
+            />
+            <Stack.Screen
+              name="(tabs)/shopping"
+              options={{ headerShown: false }}
+            />
+          </>
+        ) : (
+          <>
+            <Stack.Screen
+              name="(auth)"
+              options={{ headerShown: false }}
+            />
+            <Stack.Screen
+              name="(auth)/signup"
+              options={{ headerShown: false }}
+            />
+          </>
+        )}
+      </Stack>
   );
-};
-
-export default AppLayout;
+}

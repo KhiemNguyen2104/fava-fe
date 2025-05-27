@@ -19,7 +19,7 @@ const CLOTHING_ITEMS = ['Coat', 'T-Shirt', 'Shirt', 'Skirt', 'Pants', 'Hat'];
 
 const ClothingPickerModal = ({ visible, onClose, onSelect } : ClothingPickerModalProps) => {
   return (
-    <Modal visible={visible} animationType="slide" transparent>
+    <Modal visible={visible} animationType="fade" transparent>
         <TouchableWithoutFeedback onPress={onClose}>
           <View style={styles.modalBackground}>
             <View style={styles.modalContainer}>

@@ -1,31 +1,31 @@
 import React from 'react';
 import { View, Text, StyleSheet, Image, ScrollView } from 'react-native';
-import RecommendationBar from '../../../components/RecommendationBar';
-import ItemCard from './../../../components/ItemCard';
+import RecommendationBar from '@/components/RecommendationBar';
+import ItemCard from '@/components/ItemCard';
 import { useRouter } from 'expo-router';
-import CircleButton from '../../../components/CircleButton';
+import CircleButton from '@/components/CircleButton';
 
 const itemCardData = [
   {
-    image: require('../../../assets/images/placeholder_big.png'),
+    image: require('@/assets/images/placeholder_big.png'),
     name: "T1 Jacket Faker",
     label: "",
     size: "XL",
   },
   {
-    image: require('../../../assets/images/placeholder_big.png'),
+    image: require('@/assets/images/placeholder_big.png'),
     name: "T1 Jacket Faker",
     label: "",
     size: "L",
   },
     {
-    image: require('../../../assets/images/placeholder_big.png'),
+    image: require('@/assets/images/placeholder_big.png'),
     name: "T1 Jacket Faker",
     label: "",
     size: "L",
   },
     {
-    image: require('../../../assets/images/placeholder_big.png'),
+    image: require('@/assets/images/placeholder_big.png'),
     name: "T1 Jacket Faker",
     label: "",
     size: "L",
@@ -49,7 +49,7 @@ const WardrobeTabScreen = () => {
                 label={item.label}
                 size={item.size} 
                 onPress={() => router.push({
-                  pathname: '/(tabs)/wardrobe/detail',
+                  pathname: '/(root)/(tabs)/wardrobe/detail',
                   params: {
                     image: item.image,
                     name: item.name,
@@ -67,7 +67,7 @@ const WardrobeTabScreen = () => {
               buttonColor="#C2185B"
               width={50}
               height={50}
-              onPress={() => router.push('/(tabs)/wardrobe/addItem')}
+              onPress={() => router.push('/(root)/(tabs)/wardrobe/addItem')}
             />
           </View>
         </View>

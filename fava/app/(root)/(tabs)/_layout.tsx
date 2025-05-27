@@ -3,7 +3,7 @@ import React from "react";
 import { Tabs } from "expo-router";
 import Icon from "react-native-vector-icons/FontAwesome6";
 import { SafeAreaView } from "react-native-safe-area-context";
-import Header from "../../components/Header";
+import Header from "@/components/Header";
 import { useSegments } from "expo-router";
 
 const ACTIVE_COLOR = "#CC1766";
@@ -27,7 +27,6 @@ const TabIcon = ({
 
 const TabLayout = () => {
   const segments = useSegments();
-
   return (
     <SafeAreaView style={{ flex: 1 }} edges={['top', 'left', 'right']}>
       <Header title={segments[1] ?? ""} />
@@ -52,7 +51,7 @@ const TabLayout = () => {
                 <TabIcon focused={focused} iconName={icon} />
               ),
               tabBarButton: (props) => {
-                const focused = segments[1] === name.split("/")[0];
+                const focused = segments[2] === name.split("/")[0];
                 const filteredProps = Object.fromEntries(
                   Object.entries(props).filter(([_, v]) => v !== null)
                 );
