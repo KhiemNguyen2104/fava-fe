@@ -3,9 +3,15 @@ import { ScrollView, Text, TouchableOpacity, StyleSheet } from 'react-native';
 
 type RecommendationBarProps = {
   categories: string[];
+  selectedCategory?: string;
+  onCategoryPress?: (category: string) => void;
 };
 
-const RecommendationBar: React.FC<RecommendationBarProps> = ({ categories }) => {
+const RecommendationBar: React.FC<RecommendationBarProps> = ({ 
+  categories,
+  selectedCategory,
+  onCategoryPress,
+}) => {
   return (
     <ScrollView 
       horizontal 
@@ -13,8 +19,22 @@ const RecommendationBar: React.FC<RecommendationBarProps> = ({ categories }) => 
       contentContainerStyle={styles.container}
     >
       {categories.map((item, index) => (
-        <TouchableOpacity key={index} style={styles.button}>
-          <Text style={styles.buttonText}>{item}</Text>
+<TouchableOpacity
+          key={index}
+          style={[
+            styles.button,
+            selectedCategory === item && styles.buttonSelected,
+          ]}
+          onPress={() => onCategoryPress?.(item)}
+        >
+          <Text
+            style={[
+              styles.buttonText,
+              selectedCategory === item && styles.buttonTextSelected,
+            ]}
+          >
+            {item}
+          </Text>
         </TouchableOpacity>
       ))}
     </ScrollView>
@@ -46,6 +66,13 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 16,
     color: 'black',
+  },
+  buttonSelected: {
+    backgroundColor: '#C2185B',
+    borderColor: '#C2185B',
+  },
+  buttonTextSelected: {
+    color: 'white',
   },
 });
 
