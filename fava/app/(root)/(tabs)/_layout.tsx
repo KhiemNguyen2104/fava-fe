@@ -5,6 +5,7 @@ import Icon from "react-native-vector-icons/FontAwesome6";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Header from "@/components/Header";
 import { useSegments } from "expo-router";
+import { StatusBar } from "react-native";
 
 const ACTIVE_COLOR = "#CC1766";
 const INACTIVE_COLOR = "#fff";
@@ -28,7 +29,7 @@ const TabIcon = ({
 const TabLayout = () => {
   const segments = useSegments();
   return (
-    <SafeAreaView style={{ flex: 1 }} edges={['top', 'left', 'right']}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: "#000"  }} edges={['top', 'left', 'right']}>
       <Header title={segments[1] ?? ""} />
       <Tabs
         screenOptions={{
