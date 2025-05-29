@@ -1,4 +1,3 @@
-// PurposePickerModal.js
 import React, { useState } from 'react';
 import {
   View,
@@ -51,19 +50,19 @@ const PurposePickerModal = ({ visible, onClose, onSelect } : PurposePickerModalP
                 <Text style={styles.itemText}>{item}</Text>
               </TouchableOpacity>
             )}
-            ListFooterComponent={
-              <View style={styles.otherContainer}>
-                <Text style={styles.otherLabel}>Other:</Text>
-                <TextInput
-                  placeholder="Enter your purpose"
-                  value={customPurpose}
-                  onChangeText={setCustomPurpose}
-                  style={styles.textInput}
-                  onSubmitEditing={handleCustomSubmit}
-                  returnKeyType="done"
-                />
-              </View>
-            }
+            // ListFooterComponent={
+            //   <View style={styles.otherContainer}>
+            //     <Text style={styles.otherLabel}>Other:</Text>
+            //     <TextInput
+            //       placeholder="Enter your purpose"
+            //       value={customPurpose}
+            //       onChangeText={setCustomPurpose}
+            //       style={styles.textInput}
+            //       onSubmitEditing={handleCustomSubmit}
+            //       returnKeyType="done"
+            //     />
+            //   </View>
+            // }
           />
         </View>
       </View>

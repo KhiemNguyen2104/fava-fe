@@ -51,15 +51,29 @@ export default function AddItem() {
   };
 
   const takePhoto = async () => {
-  let result = await ImagePicker.launchCameraAsync({
-    mediaTypes: ['images'],
-    quality: 1,
-  });
+    let result = await ImagePicker.launchCameraAsync({
+      mediaTypes: ['images'],
+      quality: 1,
+    });
 
-  if (!result.canceled) {
-    setImage(result.assets[0].uri);
+    if (!result.canceled) {
+      setImage(result.assets[0].uri);
+    }
+  };
+
+  const handleAddItem = () => {
+    console.log('Item added:', {
+      name,
+      image,
+      type,
+      label,
+      size,
+      temperatureFrom,
+      temperatureTo,
+      purpose,
+      purposes,
+    });
   }
-};
 
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
@@ -222,7 +236,7 @@ export default function AddItem() {
           buttonColor="#00CA6E"
           width={120}
           height={50}
-          onPress={() => console.log('Remove pressed')}
+          onPress={() => handleAddItem()}
         />
       </View>
     </ScrollView> 
@@ -266,7 +280,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     right: -25,
     bottom: 0,
-    zIndex: 2,
+    zIndex: 10,
     padding: 10,
     borderWidth: 1,
     borderColor: '#d4006b',
