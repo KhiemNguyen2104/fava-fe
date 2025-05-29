@@ -46,9 +46,8 @@ const LocationsScreen = () => {
         <View style={{ flex: 1 }}>
             <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
             {cityWeatherData.map(item => (
-              <TouchableOpacity onPress={() => handleDeleteCity()}>
+              <TouchableOpacity key={item.id} onPress={() => handleDeleteCity()}>
                 <CityWeatherCard
-                key={item.id}
                 city={item.city}
                 range={item.range}
                 currentTemp={item.currentTemp}

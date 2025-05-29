@@ -1,44 +1,14 @@
 import React from "react";
-import { useEffect, useState } from "react";
-import { Stack } from "expo-router";
+import { Slot } from "expo-router";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 
-export default function RootLayout() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  console.log(isLoggedIn);
+const RootLayout = () => {
   return (
-      <Stack screenOptions={{ headerShown: false }}>
-        {isLoggedIn ? (
-          <>
-            <Stack.Screen 
-              name="(tabs)/wardrobe" 
-              options={{ headerShown: false }} 
-            />
-            <Stack.Screen
-              name="(tabs)/home"
-              options={{ headerShown: false }}
-            />
-            <Stack.Screen
-              name="(tabs)/ai"
-              options={{ headerShown: false }}
-            />
-            <Stack.Screen
-              name="(tabs)/shopping"
-              options={{ headerShown: false }}
-            />
-          </>
-        ) : (
-          <>
-            <Stack.Screen
-              name="(auth)"
-              options={{ headerShown: false }}
-            />
-            <Stack.Screen
-              name="(auth)/signup"
-              options={{ headerShown: false }}
-            />
-          </>
-        )}
-      </Stack>
+    <GestureHandlerRootView style={{ flex: 1}}>
+        <Slot />
+    </GestureHandlerRootView>
   );
-}
+};
+
+export default RootLayout;
