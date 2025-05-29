@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, Modal, TouchableOpacity, TextInput } from 'react-native';
+import { View, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'react-native';
 import CityWeatherCard from '@/components/CityWeatherCard';
 import CircleButton from '@/components/CircleButton';
 import { useRouter } from 'expo-router';
@@ -11,9 +11,7 @@ const cityWeatherData = [
   { id: '3', city: 'Tokyo', range: '14 ~ 24 ℃', currentTemp: '21 ℃' },
   { id: '4', city: 'Paris', range: '11 ~ 19 ℃', currentTemp: '17 ℃' },
   { id: '5', city: 'Sydney', range: '16 ~ 26 ℃', currentTemp: '23 ℃' },
-  { id: '6', city: 'Tokyo', range: '14 ~ 24 ℃', currentTemp: '21 ℃' },
-  { id: '7', city: 'Paris', range: '11 ~ 19 ℃', currentTemp: '17 ℃' },
-  { id: '8', city: 'Sydney', range: '16 ~ 26 ℃', currentTemp: '23 ℃' },
+
 ];
 
 
@@ -23,21 +21,39 @@ const LocationsScreen = () => {
     const [newCity, setNewCity] = useState('');
 
     const handleAddCity = () => {
-        // Xử lý thêm thành phố mới ở đây (ví dụ: gọi API hoặc cập nhật state)
+        // TODO: Xử lý thêm thành phố mới ở đây 
         setModalVisible(false);
         setNewCity('');
     };
 
+    const handleDeleteCity = () => {
+        Alert.alert("Delete City", "Are you sure you want to delete this city?", [
+            {
+                text: "Cancel",
+                style: "cancel"
+            },
+            {
+                text: "OK",
+                onPress: () => {
+                    // TODO: Xử lý xóa thành phố
+                    console.log("City deleted");
+                }
+            }
+        ]);
+    }
+
     return (
-        <View>
+        <View style={{ flex: 1 }}>
             <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
             {cityWeatherData.map(item => (
+              <TouchableOpacity onPress={() => handleDeleteCity()}>
                 <CityWeatherCard
                 key={item.id}
                 city={item.city}
                 range={item.range}
                 currentTemp={item.currentTemp}
                 />
+              </TouchableOpacity>
             ))}
             </ScrollView>
 
@@ -58,28 +74,23 @@ const LocationsScreen = () => {
                 onPress={() => setModalVisible(true)}
                 />
             </View>
-
-
-
-        <CustomModal
-          visible={modalVisible}
-          onRequestClose={() => setModalVisible(false)}
-          fields={[
-            {
-              label: 'City:',
-              placeholder: 'City Name',
-              value: newCity,
-              onChangeText: setNewCity,
-            },
-          ]}
-          actions={[
-            { label: 'Cancel', onPress: () => setModalVisible(false) },
-            { label: 'Add', onPress: handleAddCity },
-          ]}
-        />
-
-
-
+            {/* Modal for adding city */}
+              <CustomModal
+                visible={modalVisible}
+                onRequestClose={() => setModalVisible(false)}
+                fields={[
+                  {
+                    label: 'City:',
+                    placeholder: 'City Name',
+                    value: newCity,
+                    onChangeText: setNewCity,
+                  },
+                ]}
+                actions={[
+                  { label: 'Cancel', onPress: () => setModalVisible(false) },
+                  { label: 'Add', onPress: handleAddCity },
+                ]}
+              />
         </View>
     );
 
