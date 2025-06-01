@@ -13,7 +13,7 @@ export default function OnboardingScreen() {
 
   const handleFinish = async () => {
     await AsyncStorage.setItem('hasSeenOnboarding', 'true');
-    router.replace('/(tabs)');
+    router.replace('/(auth)');
   };
 
   return (

@@ -39,9 +39,8 @@ export default function AppLayout() {
           </Stack>
         ) : (
           <Stack screenOptions={{ headerShown: false }}>
-            <Stack.Screen name="(auth)/index" />
-            <Stack.Screen name="(auth)/register" />
             <Stack.Screen name="(auth)/login" />
+            <Stack.Screen name="(auth)/register" />
           </Stack>
         )}
     </GestureHandlerRootView>

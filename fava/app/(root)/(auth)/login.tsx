@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Pressable } from 'react-native';
 import { useRouter } from 'expo-router';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios, { AxiosResponse } from 'axios';
 
 export default function LoginScreen() {
   const router = useRouter();
@@ -8,7 +10,7 @@ export default function LoginScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const [showError, setShowError] = useState(false);  
+  const [showError, setShowError] = useState(false);
 
   const validate = () => {
     if (!email) {
@@ -31,12 +33,36 @@ export default function LoginScreen() {
     return true;
   };
 
-  const handleSignIn = () => {
-    router.push('/(root)/(tabs)/home');
+  const handleSignIn = async () => {
+    if (validate()) {
+      try {
+        const data = {
+          userEmail: email,
+          password: password
+        }
+
+        const response: AxiosResponse<{ accessToken: string, refreshToken: string }> = await axios.post('https://testgithubactions-jx4x.onrender.com/auth/login', data)
+
+        console.log(response)
+
+        await AsyncStorage.setItem('refreshToken', response.data.refreshToken)
+        await AsyncStorage.setItem('accessToken', response.data.accessToken)
+
+        router.push('/(root)/(tabs)/home');
+      } catch (error: any) {
+        if (axios.isAxiosError(error) && error.response) {
+          setError(error.response.data.message || 'Login failed. Please try again.');
+        } else {
+          setError('An unexpected error occurred.');
+        }
+      }
+    }
+
+    console.log(validate())
   };
 
   const handleCreateAccount = () => {
-      router.push('/(root)/(auth)/register');
+    router.push('/(root)/(auth)/register');
   };
 
   return (

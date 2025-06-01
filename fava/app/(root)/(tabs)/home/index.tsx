@@ -3,8 +3,9 @@ import { ScrollView, View, Text, StyleSheet, TouchableOpacity } from 'react-nati
 import EnvironmentInfo from '@/components/EnvironmentInfo';
 import ItemCard from '@/components/ItemCard';
 import { Route, RouteParams, useRouter } from 'expo-router';
+import api from '@/ultils/axiosInstance';
+import { useUser } from '@/context/UserContext';
 
-const weatherAPIKey = process.env.EXPO_PUBLIC_WEATHER_API_KEY;
 const itemCardData = [
   {
     image: require('@/assets/images/placeholder_big.png'),
@@ -33,8 +34,9 @@ const itemCardData = [
 ];
 
 const HomeScreen = () => {
-
-    const [environmentInfo, setEnvironmentInfo] = React.useState({
+  const { user, loading, refreshUser, logout } = useUser();
+  
+  const [environmentInfo, setEnvironmentInfo] = React.useState({
         temperature: '',
         humidity: '',
         location: '',
@@ -43,16 +45,18 @@ const HomeScreen = () => {
 
     const fetchWeather = async () => {
         try {
-            const response = await fetch(
-                `https://api.weatherapi.com/v1/current.json?key=${weatherAPIKey}&q=auto:ip&aqi=no`
-            );
-            const data = await response.json();
+            const url = `/weather/forecast?location=${user?.currentLocation}&time=${new Date().toISOString()}`
+
+            const response = await api.get(url)
+            const data = response.data;
+
             setEnvironmentInfo({
-                location: data.location.name || "",
-                temperature: data.current.temp_c || "",
-                weatherIcon: data.current.condition.icon || "",
-                humidity: data.current.humidity || "",
+                location: data.location?.name || "",
+                temperature: data.current?.temp_c || "",
+                weatherIcon: data.current?.condition?.icon || "",
+                humidity: data.current?.humidity || "",
             });
+
             console.log("Weather data:", environmentInfo);
         } catch (error) {
             console.error("Weather fetch error:", error);
@@ -60,8 +64,14 @@ const HomeScreen = () => {
     };
 
     useEffect(() => {
-        fetchWeather();
+      refreshUser();
     }, []);
+
+    useEffect(() => {
+      if (user && user.currentLocation) {
+        fetchWeather();
+      }
+    }, [user]);
 
     const router = useRouter();
   return (
