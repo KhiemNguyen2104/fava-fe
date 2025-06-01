@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -10,9 +10,25 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import HourlyInfo from '@/components/HourlyInfo'; 
 import CircleButton from '@/components/CircleButton';
 import { useRouter } from 'expo-router';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function WeatherScreen() {
-  const hourlyForecast = [
+  const [weatherState, setWeather] = React.useState(null)
+  
+  const getWeatherData = async () => {
+    try {
+      const jsonValue = await AsyncStorage.getItem('weatherData');
+      
+      if (jsonValue !== null) {
+        const data = JSON.parse(jsonValue)
+        return data
+      }
+    } catch (err) {
+      console.error("Error reading weather data: ", err)
+    } 
+  }
+  
+  let hourlyForecast = [
     { time: '19:00', temp: '26°C' },
     { time: '20:00', temp: '27°C' },
     { time: '21:00', temp: '28°C' },
@@ -21,6 +37,7 @@ export default function WeatherScreen() {
     { time: '21:00', temp: '31°C' },
   ];
   const router = useRouter();
+  const v = 'b'
   
   return (
     <View style={styles.container}>
@@ -33,7 +50,7 @@ export default function WeatherScreen() {
       </View>
 
       {/* Current Temp */}
-      <Text style={styles.currentTemp}>27 °C</Text>
+      <Text style={styles.currentTemp}>v</Text>
       <Text style={styles.weatherStatus}>Cloudy</Text>
 
       {/* Extra Info */}
@@ -41,7 +58,7 @@ export default function WeatherScreen() {
         <Text style={styles.infoText}>25 ~ 33 °C,  Độ ẩm 53%</Text>
         <View style={styles.row}>
           <MaterialCommunityIcons name="weather-windy" size={25} color="black" />
-          <Text style={styles.infoText}> 8.9 mph</Text>
+          <Text style={styles.infoText}>8.9 mph</Text>
         </View>
         <View style={styles.row}>
           <MaterialCommunityIcons name="weather-sunny" size={25} color="black" />

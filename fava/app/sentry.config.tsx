@@ -26,5 +26,8 @@ Sentry.init({
   enabled: __DEV__,
   debug: true,
   release: release,
+  autoSessionTracking: true,
+  enableAutoSessionTracking: true,
+  tracesSampleRate: 1.0,
   dist: dist
 });

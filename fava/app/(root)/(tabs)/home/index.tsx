@@ -5,6 +5,7 @@ import ItemCard from '@/components/ItemCard';
 import { Route, RouteParams, useRouter } from 'expo-router';
 import api from '@/ultils/axiosInstance';
 import { useUser } from '@/context/UserContext';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const itemCardData = [
   {
@@ -19,13 +20,13 @@ const itemCardData = [
     label: "",
     size: "L",
   },
-    {
+  {
     image: require('@/assets/images/placeholder_big.png'),
     name: "T1 Jacket Faker",
     label: "",
     size: "L",
   },
-    {
+  {
     image: require('@/assets/images/placeholder_big.png'),
     name: "T1 Jacket Faker",
     label: "",
@@ -35,59 +36,61 @@ const itemCardData = [
 
 const HomeScreen = () => {
   const { user, loading, refreshUser, logout } = useUser();
-  
+
   const [environmentInfo, setEnvironmentInfo] = React.useState({
-        temperature: '',
-        humidity: '',
-        location: '',
-        weatherIcon: '',
-    });
+    temperature: '',
+    humidity: '',
+    location: '',
+    weatherIcon: '',
+  });
 
-    const fetchWeather = async () => {
-        try {
-            const url = `/weather/forecast?location=${user?.currentLocation}&time=${new Date().toISOString()}`
+  const fetchWeather = async () => {
+    try {
+      const url = `/weather/forecast?location=${user?.currentLocation}&time=${new Date().toISOString()}`
 
-            const response = await api.get(url)
-            const data = response.data;
+      const response = await api.get(url)
+      const data = response.data;
 
-            setEnvironmentInfo({
-                location: data.location?.name || "",
-                temperature: data.current?.temp_c || "",
-                weatherIcon: data.current?.condition?.icon || "",
-                humidity: data.current?.humidity || "",
-            });
+      await AsyncStorage.setItem('weatherData', JSON.stringify(data))
 
-            console.log("Weather data:", environmentInfo);
-        } catch (error) {
-            console.error("Weather fetch error:", error);
-        }
-    };
+      setEnvironmentInfo({
+        location: data.location?.name || "",
+        temperature: data.current?.temp_c || "",
+        weatherIcon: data.current?.condition?.icon || "",
+        humidity: data.current?.humidity || "",
+      });
 
-    useEffect(() => {
-      refreshUser();
-    }, []);
+      console.log("Weather data:", environmentInfo);
+    } catch (error) {
+      console.error("Weather fetch error:", error);
+    }
+  };
 
-    useEffect(() => {
-      if (user && user.currentLocation) {
-        fetchWeather();
-      }
-    }, [user]);
+  useEffect(() => {
+    refreshUser();
+  }, []);
 
-    const router = useRouter();
+  useEffect(() => {
+    if (user && user.currentLocation) {
+      fetchWeather();
+    }
+  }, [user]);
+
+  const router = useRouter();
   return (
     <ScrollView style={{ backgroundColor: '#fff' }}>
-        <TouchableOpacity onPress={() => router.push( '/(tabs)/home/environment' as Route)}>
-          <EnvironmentInfo
-              weatherIcon={environmentInfo.weatherIcon}
-              temperature={environmentInfo.temperature}
-              humidity={environmentInfo.humidity}
-              location={environmentInfo.location}
-          />
-        </TouchableOpacity>
-        <Text style={styles.title}>Shopping suggestion</Text>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.suggestionContainer}>
+      <TouchableOpacity onPress={() => router.push('/(tabs)/home/environment' as Route)}>
+        <EnvironmentInfo
+          weatherIcon={environmentInfo.weatherIcon}
+          temperature={environmentInfo.temperature}
+          humidity={environmentInfo.humidity}
+          location={environmentInfo.location}
+        />
+      </TouchableOpacity>
+      <Text style={styles.title}>Shopping suggestion</Text>
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.suggestionContainer}>
         {itemCardData.map((item, index) => (
-            <ItemCard
+          <ItemCard
             key={index}
             image={item.image}
             name={item.name}
@@ -102,9 +105,9 @@ const HomeScreen = () => {
                 size: item.size,
               },
             })}
-            />
+          />
         ))}
-        </ScrollView>
+      </ScrollView>
     </ScrollView>
   );
 };
