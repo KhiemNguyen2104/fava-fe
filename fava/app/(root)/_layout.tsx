@@ -25,6 +25,7 @@ export default function AppLayout() {
 
         await AsyncStorage.setItem('accessToken', response.data)
         setIsLoggedIn(true)
+        router.replace('/(root)/(tabs)/home') 
       } catch (error) {
         console.error("Refresh Error: ", error)
         setIsLoggedIn(false)

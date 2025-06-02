@@ -77,10 +77,15 @@ const WardrobeTabScreen = () => {
   }, []);
 
   useEffect(() => {
-    if (user && user.clothes) {
+    if (user && user.clothes && user.clothes.length > 0) {
       console.log("User clothes updated:", user.clothes);
-      console.log("Purposes: ", encodeURIComponent(JSON.stringify(user.clothes[0].purposes)))
+      console.log(
+        "Purposes: ",
+        encodeURIComponent(JSON.stringify(user.clothes[0].purposes))
+      );
       setClothes(user.clothes);
+    } else {
+      setClothes([]); 
     }
   }, [user]);
 

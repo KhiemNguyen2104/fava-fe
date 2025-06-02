@@ -3,7 +3,6 @@ import { Slot } from "expo-router";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { UserProvider } from "@/context/UserContext";
 
-
 const RootLayout = () => {
   return (
     <UserProvider>
