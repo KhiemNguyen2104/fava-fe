@@ -43,8 +43,6 @@ export default function LoginScreen() {
 
         const response: AxiosResponse<{ accessToken: string, refreshToken: string }> = await axios.post('https://testgithubactions-jx4x.onrender.com/auth/login', data)
 
-        console.log(response)
-
         await AsyncStorage.setItem('refreshToken', response.data.refreshToken)
         await AsyncStorage.setItem('accessToken', response.data.accessToken)
 
@@ -52,13 +50,13 @@ export default function LoginScreen() {
       } catch (error: any) {
         if (axios.isAxiosError(error) && error.response) {
           setError(error.response.data.message || 'Login failed. Please try again.');
+          setShowError(true)
         } else {
           setError('An unexpected error occurred.');
+          setShowError(true)
         }
       }
     }
-
-    console.log(validate())
   };
 
   const handleCreateAccount = () => {

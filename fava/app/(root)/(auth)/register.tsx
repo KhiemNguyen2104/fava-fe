@@ -1,12 +1,15 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Pressable, Modal } from 'react-native';
 import { useRouter } from 'expo-router';
+import axios, { AxiosResponse } from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function RegisterScreen() {
   const router = useRouter();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [userName, setUserName] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
   const [showError, setShowError] = useState(false);
@@ -27,6 +30,12 @@ export default function RegisterScreen() {
     }
     if (!password) {
       setError('Please give me your password');
+      setShowError(true);
+      setShowSuccess(false);
+      return false;
+    }
+    if (!userName) {
+      setError('Please give me your user name');
       setShowError(true);
       setShowSuccess(false);
       return false;
@@ -54,10 +63,33 @@ export default function RegisterScreen() {
     return true;
   };
 
-  const handleSignUp = () => {
+  const handleSignUp = async () => {
     if (validate()) {
-      setShowSuccess(true);
-      setShowError(false);
+      try {
+        const data = {
+          userEmail: email,
+          userName: userName,
+          password: password
+        }
+        
+        const response: AxiosResponse<{ accessToken: string, refreshToken: string }> = await axios.post('https://testgithubactions-jx4x.onrender.com/auth/signup', data)
+        
+        await AsyncStorage.setItem('refreshToken', response.data.refreshToken)
+        await AsyncStorage.setItem('accessToken', response.data.accessToken)
+
+        setShowSuccess(true);
+        setShowError(false);
+
+        router.push('/(root)/(tabs)/home')
+      } catch (error) {
+        if (axios.isAxiosError(error) && error.response) {
+          setError(error.response.data.message || 'Signup failed. Please try again.');
+          setShowError(true)
+        } else {
+          setError('An unexpected error occurred.');
+          setShowError(true)
+        }
+      }
     }
   };
 
@@ -67,7 +99,7 @@ export default function RegisterScreen() {
   };
 
   const handleAlreadyHaveAccount = () => {
-    router.push('/(root)/(auth)');
+    router.push('/(root)/(auth)/login');
   }
 
   return (
@@ -85,7 +117,7 @@ export default function RegisterScreen() {
         <View style={styles.modalOverlay}>
           <View style={styles.successModal}>
             <Text style={styles.successModalText}>
-              Register successfully!{'\n'}You will be moved to login page
+              Register successfully!{'\n'}You will be moved to the Home page
             </Text>
             <Pressable style={styles.okayButton} onPress={handleOkay}>
               <Text style={styles.okayButtonText}>Okay</Text>
@@ -104,6 +136,15 @@ export default function RegisterScreen() {
         value={email}
         onChangeText={setEmail}
         keyboardType="email-address"
+        autoCapitalize="none"
+        onFocus={() => setShowError(false)}
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="User Name"
+        placeholderTextColor="#6B7280"
+        value={userName}
+        onChangeText={setUserName}
         autoCapitalize="none"
         onFocus={() => setShowError(false)}
       />

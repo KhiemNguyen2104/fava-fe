@@ -28,20 +28,20 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   const refreshUser = async () => {
     setLoading(true);
     try {
-        const response = await api.get('/users/profile');
+      const response = await api.get('/users/profile');
 
-        setUser({
-          email: response.data.userEmail,
-          name: response.data.userName,
-          currentLocation: response.data.currentLocation,
-          suggestions: response.data.suggestions,
-          usefulSuggestions: response.data.usefulSuggestions
-        });
+      setUser({
+        email: response.data.userEmail,
+        name: response.data.userName,
+        currentLocation: response.data.currentLocation,
+        suggestions: response.data.suggestions,
+        usefulSuggestions: response.data.usefulSuggestions
+      });
     } catch (error) {
-        setUser(null);
-        console.error('Error fetching user:', error);
+      setUser(null);
+      console.error('Error fetching user:', error);
     } finally {
-        setLoading(false);
+      setLoading(false);
     }
   };
 
@@ -51,9 +51,9 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     setUser(null);
   }
 
-  useEffect(() => {
-    refreshUser();
-  }, []);
+  // useEffect(() => {
+  //   refreshUser();
+  // }, []);
 
   return (
     <UserContext.Provider value={{ user, setUser, loading, refreshUser, logout }}>

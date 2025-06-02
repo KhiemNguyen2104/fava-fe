@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -7,88 +7,111 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import HourlyInfo from '@/components/HourlyInfo'; 
+import HourlyInfo from '@/components/HourlyInfo';
 import CircleButton from '@/components/CircleButton';
 import { useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useUser } from '@/context/UserContext';
 
 export default function WeatherScreen() {
-  const [weatherState, setWeather] = React.useState(null)
-  
+  const { user, refreshUser } = useUser()
+
+  const [hourlyForecast, setHourlyForecast] = useState<any[]>([]);
+  const [currentTemp, setCurrentTemp] = useState<number | null>(null);
+  const [currentState, setCurrentState] = useState<string>('');
+  const [minTemp, setMinTemp] = useState<number | null>(null);
+  const [maxTemp, setMaxTemp] = useState<number | null>(null);
+  const [humidity, setHumidity] = useState<number | null>(null);
+  const [windSpeed, setWindSpeed] = useState<number | null>(null);
+  const [uv, setUv] = useState<number | null>(null);
+
   const getWeatherData = async () => {
     try {
       const jsonValue = await AsyncStorage.getItem('weatherData');
-      
+
       if (jsonValue !== null) {
-        const data = JSON.parse(jsonValue)
-        return data
+        const data = JSON.parse(jsonValue);
+        const currentHour = (new Date()).getHours()
+        const hours = data.forecast.forecastday[0].hour.filter((item: any) => (new Date(item.time)).getHours() >= currentHour)
+
+        // console.log("Hours: ", data.forecast.forecastday[0].hour.map((item) => {return {condition: item.condition, temp_c: String(item.temp_c), time: String(new Date(item.time).getHours())}}))
+
+        setHourlyForecast(hours.map((item: any) => { return { condition: item.condition, temp_c: String(item.temp_c), time: String(new Date(item.time).getHours()) } }));
+        setCurrentTemp(data.current.temp_c);
+        setCurrentState(data.current.condition.text);
+        setMinTemp(data.forecast.forecastday[0].day.mintemp_c);
+        setMaxTemp(data.forecast.forecastday[0].day.maxtemp_c);
+        setHumidity(data.current.humidity);
+        setWindSpeed(data.current.wind_mph);
+        setUv(data.current.uv);
       }
     } catch (err) {
       console.error("Error reading weather data: ", err)
-    } 
+    }
   }
-  
-  let hourlyForecast = [
-    { time: '19:00', temp: '26°C' },
-    { time: '20:00', temp: '27°C' },
-    { time: '21:00', temp: '28°C' },
-    { time: '19:00', temp: '29°C' },
-    { time: '20:00', temp: '30°C' },
-    { time: '21:00', temp: '31°C' },
-  ];
+
   const router = useRouter();
-  const v = 'b'
-  
+
+  useEffect(() => {
+    getWeatherData()
+  }, [])
+
+  useEffect(() => {
+    console.log("Hourly Forecast Updated:", hourlyForecast);
+  }, [hourlyForecast]);
+
   return (
     <View style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <Text style={styles.city}>Ho Chi Minh</Text>
+        <Text style={styles.city}>{user?.currentLocation}</Text>
         <TouchableOpacity onPress={() => router.push('/(root)/(tabs)/home/environment/locations')}>
           <MaterialCommunityIcons name="file-document-outline" size={35} color="black" />
         </TouchableOpacity>
       </View>
 
       {/* Current Temp */}
-      <Text style={styles.currentTemp}>v</Text>
-      <Text style={styles.weatherStatus}>Cloudy</Text>
+      <Text style={styles.currentTemp}>{currentTemp}</Text>
+      <Text style={styles.weatherStatus}>{currentState}</Text>
 
       {/* Extra Info */}
       <View style={styles.extraInfo}>
-        <Text style={styles.infoText}>25 ~ 33 °C,  Độ ẩm 53%</Text>
+        <Text style={styles.infoText}>{`${minTemp} ~ ${maxTemp}℃, humidity ${humidity}%`}</Text>
         <View style={styles.row}>
           <MaterialCommunityIcons name="weather-windy" size={25} color="black" />
-          <Text style={styles.infoText}>8.9 mph</Text>
+          <Text style={styles.infoText}>{`${windSpeed} mph`}</Text>
         </View>
         <View style={styles.row}>
           <MaterialCommunityIcons name="weather-sunny" size={25} color="black" />
-          <Text style={styles.infoText}> 10.2</Text>
+          <Text style={styles.infoText}>{uv}</Text>
         </View>
       </View>
 
       {/* Hourly Forecast */}
       <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.hourlyScroll}>
-        {hourlyForecast.map((item, index) => (
-            <HourlyInfo 
-                key={index} 
-                height={200}
-                width={80}
-                temperature= {item.temp}    
-                hour= {item.time}
-                icon="//cdn.weatherapi.com/weather/64x64/night/122.png"
-            />
-        ))}
+        {(hourlyForecast.length != 0) ? hourlyForecast.map((item, index) => (
+          <HourlyInfo
+            key={index}
+            height={200}
+            width={80}
+            temperature={item.temp_c}
+            hour={item.time}
+            icon={item.condition.icon}
+          />
+        )) : (
+          <Text>No forecast data.</Text>
+        )}
       </ScrollView>
 
       {/* Back Button */}
       <View style={styles.backButton}>
         <CircleButton
-            iconName="arrow-left"
-            buttonColor="#C2185B"
-            width={50}
-            height={50}
-            onPress={() => router.back()}
-          />
+          iconName="arrow-left"
+          buttonColor="#C2185B"
+          width={50}
+          height={50}
+          onPress={() => router.back()}
+        />
       </View>
     </View>
   );

@@ -39,7 +39,7 @@ const Header: React.FC<HeaderProps> = ({ title }) => {
       <TouchableOpacity onPress={toggleMenu}>
         <View >
           <Image
-              source={require('../assets/images/placeholder.png')}
+              source={require('../assets/images/avatar-placeholder.png')}
               style={styles.avatar}
           />
         </View>

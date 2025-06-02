@@ -45,7 +45,6 @@ const WardrobeTabScreen = () => {
       ? itemCardData
       : itemCardData.filter(item => item.category === selectedCategory);
 
-
     return (
         <View style={styles.container}>
             <RecommendationBar 

@@ -1,38 +1,37 @@
 import React, { useEffect } from 'react';
 import { ScrollView, View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import EnvironmentInfo from '@/components/EnvironmentInfo';
-import ItemCard from '@/components/ItemCard';
 import { Route, RouteParams, useRouter } from 'expo-router';
 import api from '@/ultils/axiosInstance';
 import { useUser } from '@/context/UserContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const itemCardData = [
-  {
-    image: require('@/assets/images/placeholder_big.png'),
-    name: "T1 Jacket Faker",
-    label: "",
-    size: "XL",
-  },
-  {
-    image: require('@/assets/images/placeholder_big.png'),
-    name: "T1 Jacket Faker",
-    label: "",
-    size: "L",
-  },
-  {
-    image: require('@/assets/images/placeholder_big.png'),
-    name: "T1 Jacket Faker",
-    label: "",
-    size: "L",
-  },
-  {
-    image: require('@/assets/images/placeholder_big.png'),
-    name: "T1 Jacket Faker",
-    label: "",
-    size: "L",
-  },
-];
+// const itemCardData = [
+//   {
+//     image: require('@/assets/images/placeholder_big.png'),
+//     name: "T1 Jacket Faker",
+//     label: "",
+//     size: "XL",
+//   },
+//   {
+//     image: require('@/assets/images/placeholder_big.png'),
+//     name: "T1 Jacket Faker",
+//     label: "",
+//     size: "L",
+//   },
+//   {
+//     image: require('@/assets/images/placeholder_big.png'),
+//     name: "T1 Jacket Faker",
+//     label: "",
+//     size: "L",
+//   },
+//   {
+//     image: require('@/assets/images/placeholder_big.png'),
+//     name: "T1 Jacket Faker",
+//     label: "",
+//     size: "L",
+//   },
+// ];
 
 const HomeScreen = () => {
   const { user, loading, refreshUser, logout } = useUser();
@@ -46,7 +45,7 @@ const HomeScreen = () => {
 
   const fetchWeather = async () => {
     try {
-      const url = `/weather/forecast?location=${user?.currentLocation}&time=${new Date().toISOString()}`
+      const url = `/weather/forecast?location=${user?.currentLocation}`
 
       const response = await api.get(url)
       const data = response.data;
@@ -88,7 +87,10 @@ const HomeScreen = () => {
         />
       </TouchableOpacity>
       <Text style={styles.title}>Shopping suggestion</Text>
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.suggestionContainer}>
+      <View style={styles.alterContainer}>
+        <Text style={styles.alterText}>This feature is coming soon!</Text>
+      </View>
+      {/* <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.suggestionContainer}>
         {itemCardData.map((item, index) => (
           <ItemCard
             key={index}
@@ -107,7 +109,7 @@ const HomeScreen = () => {
             })}
           />
         ))}
-      </ScrollView>
+      </ScrollView> */}
     </ScrollView>
   );
 };
@@ -122,6 +124,15 @@ const styles = StyleSheet.create({
   suggestionContainer: {
     paddingHorizontal: 10,
   },
+  alterContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  alterText: {
+    fontSize: 18,
+    textAlign: 'center'
+  }
 });
 
 export default HomeScreen;

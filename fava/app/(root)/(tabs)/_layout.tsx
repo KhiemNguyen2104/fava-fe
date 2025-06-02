@@ -5,7 +5,6 @@ import Icon from "react-native-vector-icons/FontAwesome6";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Header from "@/components/Header";
 import { useSegments } from "expo-router";
-import { StatusBar } from "react-native";
 
 const ACTIVE_COLOR = "#CC1766";
 const INACTIVE_COLOR = "#fff";
@@ -85,7 +84,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   tabBarStyle: {
-    backgroundColor: "#000", // TODO: this is temporary, change to #CC1766 when succesfully implement immersive mode
+    backgroundColor: "#000",
     height: "14%",
   },
 });
