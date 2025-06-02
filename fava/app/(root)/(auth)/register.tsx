@@ -166,12 +166,12 @@ export default function RegisterScreen() {
         onChangeText={setConfirmPassword}
         onFocus={() => setShowError(false)}
       />
-      <Pressable style={styles.signUpButton} onPress={handleSignUp}>
+      <TouchableOpacity style={styles.signUpButton} onPress={handleSignUp}>
         <Text style={styles.signUpText}>Sign up</Text>
-      </Pressable>
-      <Pressable>
+      </TouchableOpacity>
+      <TouchableOpacity>
         <Text style={styles.haveAccount} onPress={handleAlreadyHaveAccount}>Already have an account</Text>
-      </Pressable>
+      </TouchableOpacity>
       <Text style={styles.orContinue}>Or continue with</Text>
       <View style={styles.socialContainer}>
         <View style={styles.socialButton}><Text style={styles.socialIcon}>G</Text></View>
