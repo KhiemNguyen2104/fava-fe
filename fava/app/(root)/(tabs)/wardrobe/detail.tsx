@@ -7,12 +7,13 @@ import CircleBurron from '@/components/CircleButton';
 import { useRouter } from 'expo-router';
 import { ScrollView } from 'react-native-gesture-handler';
 import CustomModal from '@/components/CustomModal';
-import ClothingPickerModal from '@/components/ClothingModal';
+import SingleOptionPickerModal from '@/components/SingleOptionModal';
 import ScreenDivider from '@/components/ScreenDivider';
 import PurposePickerModal from '@/components/PurposePickerModal';
 import { useLocalSearchParams } from 'expo-router';
 
 const transparentBg = require('@/assets/images/transparent-bg.jpg'); 
+const SIZE = ['S', 'M', 'L', 'X','XL', 'XXL'];
 
 
 const ItemDetailScreen = ({}) => {
@@ -32,7 +33,6 @@ const ItemDetailScreen = ({}) => {
     Array.isArray(parLabel) ? parLabel[0] : parLabel || ''
   );
   const [size, setSize] = useState(parSize || '');  
-  const [purpose, setPurpose] = useState('');
   
   const [temperatureFrom, setTemperatureFrom] = useState('');
   const [temperatureTo, setTemperatureTo] = useState('');
@@ -42,15 +42,17 @@ const ItemDetailScreen = ({}) => {
   const [clothingSelectedItem, setClothingSelectedItem] = useState<string | null>(null);
 
   const [purposeModalVisible, setPurposeModalVisible] = useState(false);
-  const [purposes, setPurposes] = useState<string[]>([]);
+  const [choosenPurpose, setChoosenPurpose] = useState('');
+
+  const [sizeModalVisible, setSizeModalVisible] = useState(false);
+  const [sizeSelectedItem, setSizeSelectedItem] = useState<string | null>(
+    Array.isArray(parSize) ? parSize[0] : parSize || ''
+  );
 
   const router = useRouter();
 
-  const handleAddPurpose = (purpose: string) => {
-    if (purpose && !purposes.includes(purpose)) {
-      setPurposes([...purposes, purpose]);
-    }
-    setPurpose(purpose); 
+  const handleAddPurpose = (purposeArray: string[]) => {
+    setChoosenPurpose(purposeArray.join(', ')); 
   };
 
   const pickImage = async () => {
@@ -110,7 +112,7 @@ const ItemDetailScreen = ({}) => {
     }
 
     // Logic to save the item goes here
-    console.log('Item saved:', { name, image, type, label, size, temperatureFrom, temperatureTo, purpose });
+    console.log('Item saved:', { name, image, type, label, size, temperatureFrom, temperatureTo, choosenPurpose });
     
     // Navigate back and show success message
     Alert.alert('Success', 'Item saved successfully!');
@@ -161,7 +163,7 @@ const ItemDetailScreen = ({}) => {
             </TouchableOpacity>
         </View>
         {/* Modal for selecting clothing type */}
-          <ClothingPickerModal
+          <SingleOptionPickerModal
             visible={clothingModalVisible}
             onSelect={(item) => {
               setType(item);
@@ -178,8 +180,29 @@ const ItemDetailScreen = ({}) => {
 
         <View style={styles.inputRow}>
             <Text style={styles.label}>Size:</Text>
-            <TextInput style={styles.input} placeholder="XL" value={Array.isArray(size) ? size[0] : size} onChangeText={setSize} />
+            <TouchableOpacity
+              style={[styles.input, { justifyContent: 'center' }]}
+              onPress={() => setSizeModalVisible(true)}
+             >
+              <Text  style={{ color: sizeSelectedItem ? '#111' : '#666' }}>
+                { sizeSelectedItem
+                  ? `${sizeSelectedItem}`
+                  : 'Select Size'}
+              </Text>
+            </TouchableOpacity>        
         </View>
+          {/* Modal for selecting size */}
+          <SingleOptionPickerModal
+            data={SIZE}
+            visible={sizeModalVisible}
+            onSelect={(item) => {
+              setSize(item);
+              setSizeSelectedItem(item);
+              setSizeModalVisible(false);
+            }}
+            onClose={() => setSizeModalVisible(false)}
+          />
+
 
         <View style={styles.inputRow}>
           <Text style={styles.label}>Temperature:</Text>
@@ -242,9 +265,9 @@ const ItemDetailScreen = ({}) => {
               style={[styles.input, { justifyContent: 'center' }]}
               onPress={() => setPurposeModalVisible(true)}
              >
-              <Text  style={{ color: purpose ? '#111' : '#666' }}>
-                { purpose
-                  ? `${purpose}`
+              <Text  style={{ color: choosenPurpose ? '#111' : '#666' }}>
+                { choosenPurpose
+                  ? `${choosenPurpose}`
                   : 'Work, Go out, Party,...'}
               </Text>
             </TouchableOpacity>

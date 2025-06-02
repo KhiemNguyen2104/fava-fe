@@ -13,60 +13,83 @@ import {
 const PURPOSES = ['Work', 'Go out', 'Party'];
 
 type PurposePickerModalProps = {
-    visible: boolean;
-    onClose: () => void;
-    onSelect: (item: string) => void;
+  visible: boolean;
+  onClose: () => void;
+  onSelect: (items: string[]) => void;
 };
 
-const PurposePickerModal = ({ visible, onClose, onSelect } : PurposePickerModalProps) => {
-  const [customPurpose, setCustomPurpose] = useState('');
+const PurposePickerModal = ({ visible, onClose, onSelect }: PurposePickerModalProps) => {
+  const [selectedPurposes, setSelectedPurposes] = useState<string[]>([]);
+  //const [customPurpose, setCustomPurpose] = useState('');
 
-  const handleSelect = (item: string) => {
-    onSelect(item);
-    onClose();
+  const togglePurpose = (item: string) => {
+    setSelectedPurposes((prev) =>
+      prev.includes(item)
+        ? prev.filter((p) => p !== item)
+        : [...prev, item]
+    );
   };
 
-  const handleCustomSubmit = () => {
-    if (customPurpose.trim()) {
-      onSelect(customPurpose.trim());
-      setCustomPurpose('');
-      onClose();
-    }
+  // const handleCustomSubmit = () => {
+  //   if (customPurpose.trim() && !selectedPurposes.includes(customPurpose.trim())) {
+  //     setSelectedPurposes((prev) => [...prev, customPurpose.trim()]);
+  //     setCustomPurpose('');
+  //   }
+  // };
+
+  const handleDone = () => {
+    onSelect(selectedPurposes);
+    setSelectedPurposes([]);
+    onClose();
   };
 
   return (
     <Modal visible={visible} animationType="fade" transparent>
-    <TouchableWithoutFeedback onPress={onClose}>
-      <View style={styles.modalBackground}>
-        <View style={styles.modalContainer}>
-          <FlatList
-            data={PURPOSES}
-            keyExtractor={(item) => item}
-            renderItem={({ item }) => (
-              <TouchableOpacity
-                style={styles.item}
-                onPress={() => handleSelect(item)}
-              >
-                <Text style={styles.itemText}>{item}</Text>
+      <TouchableWithoutFeedback onPress={onClose}>
+        <View style={styles.modalBackground}>
+          <TouchableWithoutFeedback>
+            <View style={styles.modalContainer}>
+              <FlatList
+                data={PURPOSES}
+                keyExtractor={(item) => item}
+                renderItem={({ item }) => (
+                  <TouchableOpacity
+                    style={[
+                      styles.item,
+                      selectedPurposes.includes(item) && { backgroundColor: '#F1F4FF' },
+                    ]}
+                    onPress={() => togglePurpose(item)}
+                  >
+                    <Text style={styles.itemText}>
+                      {selectedPurposes.includes(item) ? '✓ ' : ''}
+                      {item}
+                    </Text>
+                  </TouchableOpacity>
+                )}
+                // ListFooterComponent={
+                //   <View style={styles.otherContainer}>
+                //     <Text style={styles.otherLabel}>Other:</Text>
+                //     <TextInput
+                //       placeholder="Enter your purpose"
+                //       value={customPurpose}
+                //       onChangeText={setCustomPurpose}
+                //       style={styles.textInput}
+                //       onSubmitEditing={handleCustomSubmit}
+                //       returnKeyType="done"
+                //     />
+                //     <TouchableOpacity onPress={handleCustomSubmit} style={{ marginLeft: 8 }}>
+                //       <Text style={{ color: '#800040', fontWeight: 'bold' }}>Add</Text>
+                //     </TouchableOpacity>
+                //   </View>
+                // }
+              />
+              <TouchableOpacity style={styles.closeButton} onPress={handleDone}>
+                <Text style={styles.closeText}>Done</Text>
               </TouchableOpacity>
-            )}
-            // ListFooterComponent={
-            //   <View style={styles.otherContainer}>
-            //     <Text style={styles.otherLabel}>Other:</Text>
-            //     <TextInput
-            //       placeholder="Enter your purpose"
-            //       value={customPurpose}
-            //       onChangeText={setCustomPurpose}
-            //       style={styles.textInput}
-            //       onSubmitEditing={handleCustomSubmit}
-            //       returnKeyType="done"
-            //     />
-            //   </View>
-            // }
-          />
+            </View>
+          </TouchableWithoutFeedback>
         </View>
-      </View>
-    </TouchableWithoutFeedback>
+      </TouchableWithoutFeedback>
     </Modal>
   );
 };
@@ -118,13 +141,14 @@ const styles = StyleSheet.create({
   closeButton: {
     marginTop: 10,
     padding: 12,
-    backgroundColor: '#800040',
+    backgroundColor: '#C2185B',
     borderRadius: 10,
     alignItems: 'center',
   },
   closeText: {
     color: '#fff',
     fontWeight: 'bold',
+    fontSize: 16,
   },
 });
 
