@@ -113,24 +113,30 @@ const WardrobeTabScreen = () => {
                 (item.label ? `&label=${encodeURIComponent(item.label)}` : '') +
                 (item.size ? `&size=${encodeURIComponent(item.size)}` : '')
               }
-        name={item.name}
-        label={item.label}
-        size={item.size}
-        onPress={() => router.push({
-          pathname: '/(root)/(tabs)/wardrobe/detail',
-          params: {
-            parImage: item.image,
-            parName: item.name,
-            parKind: item.kind,
-            parLabel: item.label,
-            parSize: item.size,
-            parTempFloor: item.tempFloor,
-            parTempRoof: item.tempRoof,
-            parPurposes: item.purposes
-          },
-        })}
+              name={item.name}
+              label={item.label}
+              size={item.size}
+              onPress={() => router.push({
+                pathname: '/(root)/(tabs)/wardrobe/detail',
+                params: {
+                  parImage: `name=${encodeURIComponent(item.name)}` +
+                    `&kind=${item.kind}` +
+                    `&tempFloor=${item.tempFloor}` +
+                    `&tempRoof=${item.tempRoof}` +
+                    `&purposes=${encodeURIComponent(JSON.stringify(item.purposes))}` +
+                    (item.label ? `&label=${encodeURIComponent(item.label)}` : '') +
+                    (item.size ? `&size=${encodeURIComponent(item.size)}` : ''),
+                  parName: item.name,
+                  parKind: item.kind,
+                  parLabel: item.label,
+                  parSize: item.size,
+                  parTempFloor: item.tempFloor,
+                  parTempRoof: item.tempRoof,
+                  parPurposes: item.purposes
+                },
+              })}
             />
-        ))
+          ))
         )}
       </ScrollView>
 

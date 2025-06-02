@@ -76,12 +76,12 @@ export default function WeatherScreen() {
       </View>
 
       {/* Current Temp */}
-      <Text style={styles.currentTemp}>{currentTemp}</Text>
+      <Text style={styles.currentTemp}>{`${currentTemp} ℃`}</Text>
       <Text style={styles.weatherStatus}>{currentState}</Text>
 
       {/* Extra Info */}
       <View style={styles.extraInfo}>
-        <Text style={styles.infoText}>{`${minTemp} ~ ${maxTemp}℃, humidity ${humidity}%`}</Text>
+        <Text style={styles.infoText}>{`${minTemp} ~ ${maxTemp} ℃, humidity ${humidity}%`}</Text>
         <View style={styles.row}>
           <MaterialCommunityIcons name="weather-windy" size={25} color="black" />
           <Text style={styles.infoText}>{`${windSpeed} mph`}</Text>

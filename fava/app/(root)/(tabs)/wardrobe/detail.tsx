@@ -11,38 +11,40 @@ import SingleOptionPickerModal from '@/components/SingleOptionModal';
 import ScreenDivider from '@/components/ScreenDivider';
 import PurposePickerModal from '@/components/PurposePickerModal';
 import { useLocalSearchParams } from 'expo-router';
+import ImageWrapper from '@/components/ImageWrapper';
+import api from '@/ultils/axiosInstance';
+import { AxiosResponse } from 'axios';
 
-const transparentBg = require('@/assets/images/transparent-bg.jpg'); 
-const SIZE = ['S', 'M', 'L', 'X','XL', 'XXL'];
+const transparentBg = require('@/assets/images/transparent-bg.jpg');
+const SIZE = ['S', 'M', 'L', 'X', 'XL', 'XXL'];
 
 
-const ItemDetailScreen = ({}) => {
+const ItemDetailScreen = ({ }) => {
   const { parImage, parName, parKind, parLabel, parSize, parTempFloor, parTempRoof, parPurposes } = useLocalSearchParams();
   const tempImage = require('@/assets/images/placeholder_big.png');
 
   const [name, setName] = useState(
     Array.isArray(parName) ? parName[0] : parName || ''
   );
-  const [image, setImage] = useState<string | null>(
-    Array.isArray(parImage) ? parImage[0] : parImage ?? null
-  );
+  const [image, setImage] = useState(parImage);
+  const [newImage, setNewImage] = useState('');
 
   // State variables for item details
   const [type, setType] = useState(parKind);
   const [label, setLabel] = useState(
     Array.isArray(parLabel) ? parLabel[0] : parLabel || ''
   );
-  const [size, setSize] = useState(parSize || '');  
-  
+  const [size, setSize] = useState(parSize || '');
+
   const [temperatureFrom, setTemperatureFrom] = useState(parTempFloor);
   const [temperatureTo, setTemperatureTo] = useState(parTempRoof);
   const [temperatureModalVisible, setTemperatureModalVisible] = useState(false);
-  
+
   const [clothingModalVisible, setClothingModalVisible] = useState(false);
   const [clothingSelectedItem, setClothingSelectedItem] = useState<string | null>(null);
 
   const [purposeModalVisible, setPurposeModalVisible] = useState(false);
-  const [choosenPurpose, setChoosenPurpose] = useState('');
+  const [choosenPurpose, setChoosenPurpose] = useState(parPurposes.split(',').sort().join(', '));
 
   const [sizeModalVisible, setSizeModalVisible] = useState(false);
   const [sizeSelectedItem, setSizeSelectedItem] = useState<string | null>(
@@ -52,13 +54,13 @@ const ItemDetailScreen = ({}) => {
   const router = useRouter();
 
   const handleAddPurpose = (purposeArray: string[]) => {
-    setChoosenPurpose(purposeArray.join(', ')); 
+    setChoosenPurpose(purposeArray.join(', '));
   };
 
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ['images'],
-        quality: 1,
+      mediaTypes: ['images'],
+      quality: 1,
     });
 
     if (!result.canceled) {
@@ -78,6 +80,7 @@ const ItemDetailScreen = ({}) => {
   };
 
   const handleRemoveItem = () => {
+    console.log('handleRemoveItem called');
     Alert.alert(
       'Confirm Removal',
       'Are you sure you want to remove this item?',
@@ -89,10 +92,28 @@ const ItemDetailScreen = ({}) => {
         {
           text: 'Remove',
           style: 'destructive',
-          onPress: () => {
-            // Logic to remove the item goes here
-            console.log('Item removed');
-            router.back();
+          onPress: async () => {
+            try {
+              const data = {
+                name: name,
+                kind: type,
+                purposes: choosenPurpose.split(',').sort(),
+                tempFloor: temperatureFrom,
+                tempRoof: temperatureTo,
+                ...(label && { label: label }),
+                ...(size && { size: size })
+              }
+              console.log("Remove data: ", data)
+
+              const response: AxiosResponse<{ message: string }, any> = await api.delete('/clothes', {data: data})
+
+              console.log(response.data.message)
+
+              console.log('Item removed');
+              router.back();
+            } catch (error) {
+              console.error(error)
+            }
           },
         },
       ],
@@ -113,7 +134,7 @@ const ItemDetailScreen = ({}) => {
 
     // Logic to save the item goes here
     console.log('Item saved:', { name, image, type, label, size, temperatureFrom, temperatureTo, choosenPurpose });
-    
+
     // Navigate back and show success message
     Alert.alert('Success', 'Item saved successfully!');
     router.back();
@@ -128,80 +149,80 @@ const ItemDetailScreen = ({}) => {
           imageStyle={{ borderRadius: 10 }}
         > */}
         {image ? (
-          <Image source={{ uri: image }} style={styles.image} />
+          <ImageWrapper image={image}></ImageWrapper>
         ) : (
           <Text style={styles.uploadText}>Upload the image</Text>
         )}
 
         <View style={styles.cameraButtons}>
-            <TouchableOpacity onPress={takePhoto}>
-              <Icon name="camera" size={24} color="white" />
-            </TouchableOpacity>
+          <TouchableOpacity onPress={takePhoto}>
+            <Icon name="camera" size={24} color="white" />
+          </TouchableOpacity>
         </View>
 
         {/* </ImageBackground> */}
       </TouchableOpacity>
-    
-      <ScreenDivider  />  
-      
-      
+
+      <ScreenDivider />
+
+
       <TextInput style={styles.nameInput} placeholder="Name" value={name} onChangeText={setName} />
 
 
-      <View style={styles.form}>        
+      <View style={styles.form}>
         <View style={styles.inputRow}>
-            <Text style={styles.label}>Type:</Text>
-             <TouchableOpacity
-              style={[styles.input, { justifyContent: 'center' }]}
-              onPress={() => setClothingModalVisible(true)}
-            >
-              <Text  style={{ color: type ? '#222' : '#666' }}>
-                { type
-                  ? `${type}`
-                  : 'Select Type'}
-              </Text>
-            </TouchableOpacity>
+          <Text style={styles.label}>Type:</Text>
+          <TouchableOpacity
+            style={[styles.input, { justifyContent: 'center' }]}
+            onPress={() => setClothingModalVisible(true)}
+          >
+            <Text style={{ color: type ? '#222' : '#666' }}>
+              {type
+                ? `${type}`
+                : 'Select Type'}
+            </Text>
+          </TouchableOpacity>
         </View>
         {/* Modal for selecting clothing type */}
-          <SingleOptionPickerModal
-            visible={clothingModalVisible}
-            onSelect={(item) => {
-              setType(item);
-              setClothingSelectedItem(item);
-              setClothingModalVisible(false);
-            }}
-            onClose={() => setClothingModalVisible(false)}
-          />
+        <SingleOptionPickerModal
+          visible={clothingModalVisible}
+          onSelect={(item) => {
+            setType(item);
+            setClothingSelectedItem(item);
+            setClothingModalVisible(false);
+          }}
+          onClose={() => setClothingModalVisible(false)}
+        />
 
         <View style={styles.inputRow}>
-            <Text style={styles.label}>Label:</Text>
-            <TextInput style={styles.input} placeholder="Adidas, Nike, ..." value={label} onChangeText={setLabel} />
+          <Text style={styles.label}>Label:</Text>
+          <TextInput style={styles.input} placeholder="Adidas, Nike, ..." value={label} onChangeText={setLabel} />
         </View>
 
         <View style={styles.inputRow}>
-            <Text style={styles.label}>Size:</Text>
-            <TouchableOpacity
-              style={[styles.input, { justifyContent: 'center' }]}
-              onPress={() => setSizeModalVisible(true)}
-             >
-              <Text  style={{ color: sizeSelectedItem ? '#111' : '#666' }}>
-                { sizeSelectedItem
-                  ? `${sizeSelectedItem}`
-                  : 'Select Size'}
-              </Text>
-            </TouchableOpacity>        
+          <Text style={styles.label}>Size:</Text>
+          <TouchableOpacity
+            style={[styles.input, { justifyContent: 'center' }]}
+            onPress={() => setSizeModalVisible(true)}
+          >
+            <Text style={{ color: sizeSelectedItem ? '#111' : '#666' }}>
+              {sizeSelectedItem
+                ? `${sizeSelectedItem}`
+                : 'Select Size'}
+            </Text>
+          </TouchableOpacity>
         </View>
-          {/* Modal for selecting size */}
-          <SingleOptionPickerModal
-            data={SIZE}
-            visible={sizeModalVisible}
-            onSelect={(item) => {
-              setSize(item);
-              setSizeSelectedItem(item);
-              setSizeModalVisible(false);
-            }}
-            onClose={() => setSizeModalVisible(false)}
-          />
+        {/* Modal for selecting size */}
+        <SingleOptionPickerModal
+          data={SIZE}
+          visible={sizeModalVisible}
+          onSelect={(item) => {
+            setSize(item);
+            setSizeSelectedItem(item);
+            setSizeModalVisible(false);
+          }}
+          onClose={() => setSizeModalVisible(false)}
+        />
 
 
         <View style={styles.inputRow}>
@@ -210,7 +231,7 @@ const ItemDetailScreen = ({}) => {
             style={[styles.input, { justifyContent: 'center' }]}
             onPress={() => setTemperatureModalVisible(true)}
           >
-            <Text  style={{ color: (temperatureFrom && temperatureTo) ? '#222' : '#666' }}>
+            <Text style={{ color: (temperatureFrom && temperatureTo) ? '#222' : '#666' }}>
               {temperatureFrom && temperatureTo
                 ? `${temperatureFrom} - ${temperatureTo}`
                 : 'From - To'}
@@ -259,28 +280,28 @@ const ItemDetailScreen = ({}) => {
           ]}
         />
 
-        <View style={styles.inputRow}>         
+        <View style={styles.inputRow}>
           <Text style={styles.label}>Purpose:</Text>
           <TouchableOpacity
-              style={[styles.input, { justifyContent: 'center' }]}
-              onPress={() => setPurposeModalVisible(true)}
-             >
-              <Text  style={{ color: choosenPurpose ? '#111' : '#666' }}>
-                { choosenPurpose
-                  ? `${choosenPurpose}`
-                  : 'Work, Go out, Party,...'}
-              </Text>
-            </TouchableOpacity>
+            style={[styles.input, { justifyContent: 'center' }]}
+            onPress={() => setPurposeModalVisible(true)}
+          >
+            <Text style={{ color: choosenPurpose ? '#111' : '#666' }}>
+              {choosenPurpose
+                ? `${choosenPurpose}`
+                : 'Work, Go out, Party,...'}
+            </Text>
+          </TouchableOpacity>
         </View>
-          {/* Modal for selecting purpose */}
-          <PurposePickerModal
-                visible={purposeModalVisible}
-                onClose={() => setPurposeModalVisible(false)}
-                onSelect={handleAddPurpose}
-              />        
-                
+        {/* Modal for selecting purpose */}
+        <PurposePickerModal
+          visible={purposeModalVisible}
+          onClose={() => setPurposeModalVisible(false)}
+          onSelect={handleAddPurpose}
+        />
+
       </View>
-      
+
       <View style={styles.buttonRow}>
         <CircleBurron
           iconName="arrow-left"
@@ -304,16 +325,16 @@ const ItemDetailScreen = ({}) => {
           onPress={() => handleRemoveItem()}
         />
       </View>
-    </ScrollView> 
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { 
-    padding: 20, 
-    backgroundColor: 'white', 
+  container: {
+    padding: 20,
+    backgroundColor: 'white',
     flex: 1,
-},
+  },
   imageBox: {
     height: 250,
     width: 250,
