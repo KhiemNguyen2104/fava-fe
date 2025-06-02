@@ -9,7 +9,8 @@ import {
     FlatList,
 } from 'react-native';
 
-type ClothingPickerModalProps = {
+type SingleOptionPickerModalProps = {
+  data?: string[];
   visible: boolean;
   onClose: () => void;
   onSelect: (item: string) => void;
@@ -17,14 +18,14 @@ type ClothingPickerModalProps = {
 
 const CLOTHING_ITEMS = ['Coat', 'T-Shirt', 'Shirt', 'Skirt', 'Pants', 'Hat'];
 
-const ClothingPickerModal = ({ visible, onClose, onSelect } : ClothingPickerModalProps) => {
+const SingleOptionPickerModal = ({ data = CLOTHING_ITEMS, visible, onClose, onSelect } : SingleOptionPickerModalProps) => {
   return (
     <Modal visible={visible} animationType="fade" transparent>
         <TouchableWithoutFeedback onPress={onClose}>
           <View style={styles.modalBackground}>
             <View style={styles.modalContainer}>
               <FlatList
-                  data={CLOTHING_ITEMS}
+                  data={data}
                   keyExtractor={(item) => item}
                   renderItem={({ item }) => (
                   <TouchableOpacity
@@ -81,4 +82,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ClothingPickerModal;
+export default SingleOptionPickerModal;

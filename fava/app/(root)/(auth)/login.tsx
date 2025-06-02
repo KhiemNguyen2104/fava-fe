@@ -94,12 +94,14 @@ export default function LoginScreen() {
       <TouchableOpacity style={styles.forgotContainer}>
         <Text style={styles.forgotText}>Forgot your password?</Text>
       </TouchableOpacity>
-      <Pressable style={styles.signInButton} onPress={handleSignIn}>
+
+      <TouchableOpacity style={styles.signInButton} onPress={handleSignIn}>
         <Text style={styles.signInText}>Sign in</Text>
-      </Pressable>
-      <Pressable onPress={handleCreateAccount}>
+      </TouchableOpacity>
+
+      <TouchableOpacity onPress={handleCreateAccount}>
         <Text style={styles.createAccount}>Create new account</Text>
-      </Pressable>
+      </TouchableOpacity>
       <Text style={styles.orContinue}>Or continue with</Text>
       <View style={styles.socialContainer}>
         <View style={styles.socialButton}><Text style={styles.socialIcon}>G</Text></View>

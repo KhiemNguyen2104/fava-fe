@@ -4,7 +4,7 @@ import RectButton from '@/components/RectangleButton';
 import { useRouter } from 'expo-router';
 import { ScrollView } from 'react-native-gesture-handler';
 import CustomModal from '@/components/CustomModal';
-import ClothingPickerModal from '@/components/ClothingModal';
+import SingleOptionPickerModal from '@/components/SingleOptionModal';
 import ScreenDivider from '@/components/ScreenDivider';
 import ItemCard from '@/components/ItemCard';
 import PurposePickerModal from '@/components/PurposePickerModal';
@@ -36,11 +36,13 @@ const itemCardData = [
   },
 ];
 
+const SIZE = ['S', 'M', 'L', 'X','XL', 'XXL'];
+
 export default function AddItem() {
   const [type, setType] = useState('');
   const [label, setLabel] = useState('');
   const [size, setSize] = useState('');
-  const [purpose, setPurpose] = useState('');
+  const [choosenPurpose, setChoosenPurpose] = useState('');
   const [isFullOutfit, setIsFullOutfit] = useState(false);
 
   const [temperatureModalVisible, setTemperatureModalVisible] = useState(false);
@@ -50,14 +52,15 @@ export default function AddItem() {
   const [clothingModalVisible, setClothingModalVisible] = useState(false);
   const [clothingSelectedItem, setClothingSelectedItem] = useState<string | null>(null);
 
+  const [sizeModalVisible, setSizeModalVisible] = useState(false);
+  const [sizeSelectedItem, setSizeSelectedItem] = useState<string | null>(null);
+
   const [purposeModalVisible, setPurposeModalVisible] = useState(false);
   const [purposes, setPurposes] = useState<string[]>([]);
 
-  const handleAddPurpose = (purpose: string) => {
-    if (purpose && !purposes.includes(purpose)) {
-      setPurposes([...purposes, purpose]);
-    }
-    setPurpose(purpose); 
+  const handleAddPurpose = (purposeArray: string[]) => {
+    setPurposes(purposeArray);
+    setChoosenPurpose(purposeArray.join(', ')); 
   };
 
   const router = useRouter();
@@ -76,9 +79,9 @@ export default function AddItem() {
               style={[styles.input, { justifyContent: 'center' }]}
               onPress={() => setPurposeModalVisible(true)}
              >
-              <Text  style={{ color: purpose ? '#111' : '#666' }}>
-                { purpose
-                  ? `${purpose}`
+              <Text  style={{ color: choosenPurpose ? '#111' : '#666' }}>
+                { choosenPurpose
+                  ? `${choosenPurpose}`
                   : 'Work, Go out, Party,...'}
               </Text>
             </TouchableOpacity>
@@ -105,7 +108,7 @@ export default function AddItem() {
             </TouchableOpacity>
         </View>
         {/* Modal for selecting clothing type */}
-          <ClothingPickerModal
+          <SingleOptionPickerModal
             visible={clothingModalVisible}
             onSelect={(item) => {
               setType(item);
@@ -122,8 +125,28 @@ export default function AddItem() {
 
         <View style={styles.inputRow}>
             <Text style={styles.label}>Size:</Text>
-            <TextInput style={styles.input} placeholder="XL" value={size} onChangeText={setSize} />
+            <TouchableOpacity
+              style={[styles.input, { justifyContent: 'center' }]}
+              onPress={() => setSizeModalVisible(true)}
+             >
+              <Text  style={{ color: sizeSelectedItem ? '#111' : '#666' }}>
+                { sizeSelectedItem
+                  ? `${sizeSelectedItem}`
+                  : 'Select Size'}
+              </Text>
+            </TouchableOpacity>        
         </View>
+          {/* Modal for selecting size */}
+          <SingleOptionPickerModal
+            data={SIZE}
+            visible={sizeModalVisible}
+            onSelect={(item) => {
+              setSize(item);
+              setSizeSelectedItem(item);
+              setSizeModalVisible(false);
+            }}
+            onClose={() => setSizeModalVisible(false)}
+          />
 
         <View style={styles.inputRow}>
           <Text style={styles.label}>Temperature:</Text>

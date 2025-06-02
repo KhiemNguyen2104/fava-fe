@@ -7,11 +7,12 @@ import CircleBurron from '@/components/CircleButton';
 import { useRouter } from 'expo-router';
 import { ScrollView } from 'react-native-gesture-handler';
 import CustomModal from '@/components/CustomModal';
-import ClothingPickerModal from '@/components/ClothingModal';
+import SingleOptionPickerModal from '@/components/SingleOptionModal';
 import ScreenDivider from '@/components/ScreenDivider';
 import PurposePickerModal from '@/components/PurposePickerModal';
 
 const transparentBg = require('@/assets/images/transparent-bg.jpg'); 
+const SIZE = ['S', 'M', 'L', 'X','XL', 'XXL'];
 
 export default function AddItem() {
   const [name, setName] = useState('');
@@ -19,7 +20,6 @@ export default function AddItem() {
   const [type, setType] = useState('');
   const [label, setLabel] = useState('');
   const [size, setSize] = useState('');
-  const [purpose, setPurpose] = useState('');
   const router = useRouter();
 
   const [temperatureModalVisible, setTemperatureModalVisible] = useState(false);
@@ -30,13 +30,13 @@ export default function AddItem() {
   const [clothingSelectedItem, setClothingSelectedItem] = useState<string | null>(null);
 
   const [purposeModalVisible, setPurposeModalVisible] = useState(false);
-  const [purposes, setPurposes] = useState<string[]>([]);
+  const [choosenPurpose, setChoosenPurpose] = useState('');
 
-  const handleAddPurpose = (purpose: string) => {
-    if (purpose && !purposes.includes(purpose)) {
-      setPurposes([...purposes, purpose]);
-    }
-    setPurpose(purpose); 
+  const [sizeModalVisible, setSizeModalVisible] = useState(false);
+  const [sizeSelectedItem, setSizeSelectedItem] = useState<string | null>(null);
+
+  const handleAddPurpose = (purposeArray: string[]) => {
+    setChoosenPurpose(purposeArray.join(', ')); 
   };
 
   const pickImage = async () => {
@@ -70,8 +70,7 @@ export default function AddItem() {
       size,
       temperatureFrom,
       temperatureTo,
-      purpose,
-      purposes,
+      choosenPurpose,
     });
   }
 
@@ -126,7 +125,7 @@ export default function AddItem() {
             </TouchableOpacity>
         </View>
         {/* Modal for selecting clothing type */}
-          <ClothingPickerModal
+          <SingleOptionPickerModal
             visible={clothingModalVisible}
             onSelect={(item) => {
               setType(item);
@@ -143,8 +142,28 @@ export default function AddItem() {
 
         <View style={styles.inputRow}>
             <Text style={styles.label}>Size:</Text>
-            <TextInput style={styles.input} placeholder="XL" value={size} onChangeText={setSize} />
+            <TouchableOpacity
+              style={[styles.input, { justifyContent: 'center' }]}
+              onPress={() => setSizeModalVisible(true)}
+             >
+              <Text  style={{ color: sizeSelectedItem ? '#111' : '#666' }}>
+                { sizeSelectedItem
+                  ? `${sizeSelectedItem}`
+                  : 'Select Size'}
+              </Text>
+            </TouchableOpacity>        
         </View>
+          {/* Modal for selecting size */}
+          <SingleOptionPickerModal
+            data={SIZE}
+            visible={sizeModalVisible}
+            onSelect={(item) => {
+              setSize(item);
+              setSizeSelectedItem(item);
+              setSizeModalVisible(false);
+            }}
+            onClose={() => setSizeModalVisible(false)}
+          />
 
         <View style={styles.inputRow}>
           <Text style={styles.label}>Temperature:</Text>
@@ -207,9 +226,9 @@ export default function AddItem() {
               style={[styles.input, { justifyContent: 'center' }]}
               onPress={() => setPurposeModalVisible(true)}
              >
-              <Text  style={{ color: purpose ? '#111' : '#666' }}>
-                { purpose
-                  ? `${purpose}`
+              <Text  style={{ color: choosenPurpose ? '#111' : '#666' }}>
+                { choosenPurpose
+                  ? `${choosenPurpose}`
                   : 'Work, Go out, Party,...'}
               </Text>
             </TouchableOpacity>
