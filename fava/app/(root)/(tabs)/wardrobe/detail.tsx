@@ -44,7 +44,13 @@ const ItemDetailScreen = ({ }) => {
   const [clothingSelectedItem, setClothingSelectedItem] = useState<string | null>(null);
 
   const [purposeModalVisible, setPurposeModalVisible] = useState(false);
-  const [choosenPurpose, setChoosenPurpose] = useState(parPurposes.split(',').sort().join(', '));
+  const [choosenPurpose, setChoosenPurpose] = useState(
+    typeof parPurposes === 'string'
+      ? parPurposes.split(',').sort().join(', ')
+      : Array.isArray(parPurposes)
+        ? parPurposes.sort().join(', ')
+        : ''
+  );
 
   const [sizeModalVisible, setSizeModalVisible] = useState(false);
   const [sizeSelectedItem, setSizeSelectedItem] = useState<string | null>(
@@ -79,6 +85,29 @@ const ItemDetailScreen = ({ }) => {
     }
   };
 
+  const handleRemoveConfirmed = async () => {
+    try {
+      const data = {
+        name: name,
+        kind: type,
+        purposes: choosenPurpose.split(',').sort(),
+        tempFloor: temperatureFrom,
+        tempRoof: temperatureTo,
+        ...(label && { label: label }),
+        ...(size && { size: size })
+      };
+      console.log("Remove data: ", data);
+
+      const response: AxiosResponse<{ message: string }, any> = await api.delete('/clothes', { data });
+      console.log(response.data.message);
+
+      console.log('Item removed');
+      router.back();
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   const handleRemoveItem = () => {
     console.log('handleRemoveItem called');
     Alert.alert(
@@ -92,29 +121,7 @@ const ItemDetailScreen = ({ }) => {
         {
           text: 'Remove',
           style: 'destructive',
-          onPress: async () => {
-            try {
-              const data = {
-                name: name,
-                kind: type,
-                purposes: choosenPurpose.split(',').sort(),
-                tempFloor: temperatureFrom,
-                tempRoof: temperatureTo,
-                ...(label && { label: label }),
-                ...(size && { size: size })
-              }
-              console.log("Remove data: ", data)
-
-              const response: AxiosResponse<{ message: string }, any> = await api.delete('/clothes', {data: data})
-
-              console.log(response.data.message)
-
-              console.log('Item removed');
-              router.back();
-            } catch (error) {
-              console.error(error)
-            }
-          },
+          onPress: handleRemoveConfirmed
         },
       ],
       { cancelable: true }
@@ -149,7 +156,7 @@ const ItemDetailScreen = ({ }) => {
           imageStyle={{ borderRadius: 10 }}
         > */}
         {image ? (
-          <ImageWrapper image={image}></ImageWrapper>
+          <ImageWrapper image={Array.isArray(image) ? image[0] : image || ''}></ImageWrapper>
         ) : (
           <Text style={styles.uploadText}>Upload the image</Text>
         )}
@@ -246,13 +253,13 @@ const ItemDetailScreen = ({ }) => {
             {
               label: 'From:',
               placeholder: 'Temperature',
-              value: temperatureFrom,
+              value: Array.isArray(temperatureFrom) ? temperatureFrom[0] : temperatureFrom || '',
               onChangeText: setTemperatureFrom,
             },
             {
               label: 'To:',
               placeholder: 'Temperature',
-              value: temperatureTo,
+              value: Array.isArray(temperatureTo) ? temperatureTo[0] : temperatureTo || '',
               onChangeText: setTemperatureTo,
             },
           ]}
@@ -262,15 +269,17 @@ const ItemDetailScreen = ({ }) => {
               label: 'OK',
               onPress: () => {
                 // Kiểm tra phải là số
+                const tempFromStr = Array.isArray(temperatureFrom) ? temperatureFrom[0] : temperatureFrom || '';
+                const tempToStr = Array.isArray(temperatureTo) ? temperatureTo[0] : temperatureTo || '';
                 if (
-                  !/^\d+(\.\d+)?$/.test(temperatureFrom) ||
-                  !/^\d+(\.\d+)?$/.test(temperatureTo)
+                  !/^\d+(\.\d+)?$/.test(tempFromStr) ||
+                  !/^\d+(\.\d+)?$/.test(tempToStr)
                 ) {
                   Alert.alert('Error', 'Please enter valid value for temperature (number).');
                   return;
                 }
                 // Kiểm tra from < to
-                if (parseFloat(temperatureFrom) >= parseFloat(temperatureTo)) {
+                if (parseFloat(tempFromStr) >= parseFloat(tempToStr)) {
                   Alert.alert('Error', '"From" must be lower than "To".');
                   return;
                 }
