@@ -6,33 +6,6 @@ import api from '@/ultils/axiosInstance';
 import { useUser } from '@/context/UserContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-// const itemCardData = [
-//   {
-//     image: require('@/assets/images/placeholder_big.png'),
-//     name: "T1 Jacket Faker",
-//     label: "",
-//     size: "XL",
-//   },
-//   {
-//     image: require('@/assets/images/placeholder_big.png'),
-//     name: "T1 Jacket Faker",
-//     label: "",
-//     size: "L",
-//   },
-//   {
-//     image: require('@/assets/images/placeholder_big.png'),
-//     name: "T1 Jacket Faker",
-//     label: "",
-//     size: "L",
-//   },
-//   {
-//     image: require('@/assets/images/placeholder_big.png'),
-//     name: "T1 Jacket Faker",
-//     label: "",
-//     size: "L",
-//   },
-// ];
-
 const HomeScreen = () => {
   const { user, loading, refreshUser, logout } = useUser();
 

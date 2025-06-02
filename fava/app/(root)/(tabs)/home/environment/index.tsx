@@ -28,6 +28,7 @@ export default function WeatherScreen() {
   const getWeatherData = async () => {
     try {
       const jsonValue = await AsyncStorage.getItem('weatherData');
+      console.log("User: ", user)
 
       if (jsonValue !== null) {
         const data = JSON.parse(jsonValue);
@@ -53,8 +54,12 @@ export default function WeatherScreen() {
   const router = useRouter();
 
   useEffect(() => {
-    getWeatherData()
+    refreshUser()
   }, [])
+
+  useEffect(() => {
+    getWeatherData()
+  }, [user])
 
   useEffect(() => {
     console.log("Hourly Forecast Updated:", hourlyForecast);

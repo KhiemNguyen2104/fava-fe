@@ -1,30 +1,44 @@
 import React, { useState, useEffect } from "react";
-import { Stack, useSegments } from "expo-router";
+import { Stack, useRouter, useSegments } from "expo-router";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { BackHandler, Alert } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import axios, { AxiosResponse } from "axios";
 
 export default function AppLayout() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false); // TODO: thực hiện kiểm tra đăng nhập thực tế
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [loading, setLoading] = useState(true)
+  const router = useRouter()
 
-  // useEffect(() => {
-  //   const backAction = () => {
-  //     if (segments.length === 3) {
-  //       Alert.alert("Exit Smart Home", "Are you sure?", [
-  //         { text: "Cancel", onPress: () => null, style: "cancel" },
-  //         { text: "Exit", onPress: () => BackHandler.exitApp() },
-  //       ]);
-  //       return true;
-  //     }
-  //     return false;
-  //   };
+  const checkIsLoggedIn = async () => {
+    const refreshToken = await AsyncStorage.getItem('refreshToken')
 
-  //   const backHandler = BackHandler.addEventListener(
-  //     "hardwareBackPress",
-  //     backAction
-  //   );
+    // console.log("Check logged in: ", refreshToken)
 
-  //   return () => backHandler.remove();
-  // }, [segments]);
+    if (refreshToken) {
+      try {
+        const response: AxiosResponse<string> = await axios.post(
+          `https://testgithubactions-jx4x.onrender.com/auth/resignAccessToken?Refresh Token=${refreshToken}`
+        )
+
+        // console.log("Check logged in: Access Token: ", response.data)
+
+        await AsyncStorage.setItem('accessToken', response.data)
+        setIsLoggedIn(true)
+      } catch (error) {
+        console.error("Refresh Error: ", error)
+        setIsLoggedIn(false)
+      }
+    } else {
+      setIsLoggedIn(false)
+    }
+
+    setLoading(false)
+  }
+
+  useEffect(() => {
+    checkIsLoggedIn()
+  }, [])
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>

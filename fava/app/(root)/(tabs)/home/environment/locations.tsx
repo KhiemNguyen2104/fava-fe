@@ -7,6 +7,7 @@ import CustomModal from '@/components/CustomModal';
 import { useUser } from '@/context/UserContext';
 import api from '@/ultils/axiosInstance';
 import { AxiosResponse } from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const LocationsScreen = () => {
   const { user, refreshUser } = useUser()
@@ -52,6 +53,7 @@ const LocationsScreen = () => {
 
   const handleAddCity = async () => {
     try {
+      console.log("New City: ", newCity)
       const response: AxiosResponse<string, any> = await api.post(`/weather/city?name=${newCity}`)
 
       setModalVisible(false);
@@ -88,7 +90,7 @@ const LocationsScreen = () => {
     ]);
   }
 
-  const handleSelectCity = async () => {
+  const handleSelectCity = async (newCity: string) => {
     try {
       const data = {
         userEmail: user?.email,
@@ -97,6 +99,13 @@ const LocationsScreen = () => {
       }
 
       const response = await api.put('/users/profile', data)
+      const newWeatherData = await api.get(`/weather/forecast?location=${newCity}`)
+
+      const d = newWeatherData.data;
+
+      await AsyncStorage.setItem('weatherData', JSON.stringify(d))
+
+      console.log("Update: ", response.data)
 
       router.push('/(root)/(tabs)/home/environment')
     } catch (err) {
@@ -105,8 +114,14 @@ const LocationsScreen = () => {
   }
 
   useEffect(() => {
-    refreshUser()
-    getAllCities()
+    const f = async () => {
+      await refreshUser()
+      if (user) {
+        getAllCities()
+      }
+    }
+
+    f()
   }, [])
 
   useEffect(() => {
@@ -119,7 +134,7 @@ const LocationsScreen = () => {
     <View style={{ flex: 1 }}>
       <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
         {weatherData.length > 0 ? weatherData.map(item => (
-          <TouchableOpacity key={item.city} onPress={() => handleSelectCity()}>
+          <TouchableOpacity key={item.city} onPress={async () => {await handleSelectCity(item.city)}}>
             <CityWeatherCard
               city={item.city}
               range={item.range}

@@ -8,6 +8,7 @@ type User = {
   email: string;
   currentLocation: string;
   suggestions: number;
+  clothes: any[]
   usefulSuggestions: number;
 };
 
@@ -28,13 +29,23 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   const refreshUser = async () => {
     setLoading(true);
     try {
-      const response = await api.get('/users/profile');
+      const token = await AsyncStorage.getItem('accessToken');
+      console.log('Current accessToken in AsyncStorage:', token);
+
+      const response = await api.get('/users/profile', {
+        // Optional: force inspect headers here too
+        transformRequest: [(data, headers) => {
+          console.log('Request headers in refreshUser:', headers);
+          return data;
+        }]
+      });
 
       setUser({
         email: response.data.userEmail,
         name: response.data.userName,
         currentLocation: response.data.currentLocation,
         suggestions: response.data.suggestions,
+        clothes: response.data.clothes,
         usefulSuggestions: response.data.usefulSuggestions
       });
     } catch (error) {
@@ -50,10 +61,6 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     await AsyncStorage.removeItem('refreshToken');
     setUser(null);
   }
-
-  // useEffect(() => {
-  //   refreshUser();
-  // }, []);
 
   return (
     <UserContext.Provider value={{ user, setUser, loading, refreshUser, logout }}>

@@ -8,6 +8,7 @@ const api = axios.create({
 
 let isRefreshing = false;
 let failedQueue: any[] = [];
+let accessTokenInMemory: string | null = null;
 
 const processQueue = (error: any, token: string | null = null) => {
     failedQueue.forEach(prom => {
@@ -23,12 +24,12 @@ const processQueue = (error: any, token: string | null = null) => {
 
 api.interceptors.request.use(
     async (config: InternalAxiosRequestConfig): Promise<InternalAxiosRequestConfig> => {
-        const token = await AsyncStorage.getItem('accessToken')
+        if (!accessTokenInMemory) {
+            accessTokenInMemory = await AsyncStorage.getItem('accessToken');
+        }
 
-        console.log("Access Token: ", token)
-
-        if (token) {
-            config.headers.set('Authorization', `Bearer ${token}`);
+        if (accessTokenInMemory != undefined && config.headers) {
+            config.headers['Authorization'] = `Bearer ${accessTokenInMemory}`;
         }
 
         return config;
@@ -69,12 +70,15 @@ api.interceptors.response.use(
 
                 const url = `https://testgithubactions-jx4x.onrender.com/auth/resignAccessToken?Refresh%20Token=${refreshToken}`
 
-                const response: AxiosResponse<{ accessToken: string }> = await axios.post(url);
+                const response: AxiosResponse<string> = await axios.post(url);
 
                 console.log("Reassign response: ", response.data)
 
-                const newAccessToken = response.data.accessToken;
-
+                const newAccessToken = response.data;
+                accessTokenInMemory = newAccessToken;
+                
+                console.log("AT: ", accessTokenInMemory)
+                
                 await AsyncStorage.setItem('accessToken', newAccessToken);
 
                 api.defaults.headers.common.Authorization = `Bearer ${newAccessToken}`;

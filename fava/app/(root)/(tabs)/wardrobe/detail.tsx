@@ -16,8 +16,8 @@ const transparentBg = require('@/assets/images/transparent-bg.jpg');
 
 
 const ItemDetailScreen = ({}) => {
-  const { parImage, parName, parLabel, parSize } = useLocalSearchParams();
-  const tempImage = require('@/assets/images/placeholder_big.png'); 
+  const { parImage, parName, parKind, parLabel, parSize, parTempFloor, parTempRoof, parPurposes } = useLocalSearchParams();
+  const tempImage = require('@/assets/images/placeholder_big.png');
 
   const [name, setName] = useState(
     Array.isArray(parName) ? parName[0] : parName || ''
@@ -27,22 +27,22 @@ const ItemDetailScreen = ({}) => {
   );
 
   // State variables for item details
-  const [type, setType] = useState('');
+  const [type, setType] = useState(parKind);
   const [label, setLabel] = useState(
     Array.isArray(parLabel) ? parLabel[0] : parLabel || ''
   );
   const [size, setSize] = useState(parSize || '');  
   const [purpose, setPurpose] = useState('');
   
-  const [temperatureFrom, setTemperatureFrom] = useState('');
-  const [temperatureTo, setTemperatureTo] = useState('');
+  const [temperatureFrom, setTemperatureFrom] = useState(parTempFloor);
+  const [temperatureTo, setTemperatureTo] = useState(parTempRoof);
   const [temperatureModalVisible, setTemperatureModalVisible] = useState(false);
   
   const [clothingModalVisible, setClothingModalVisible] = useState(false);
   const [clothingSelectedItem, setClothingSelectedItem] = useState<string | null>(null);
 
   const [purposeModalVisible, setPurposeModalVisible] = useState(false);
-  const [purposes, setPurposes] = useState<string[]>([]);
+  const [purposes, setPurposes] = useState<string[]>(parPurposes || []);
 
   const router = useRouter();
 
@@ -153,9 +153,9 @@ const ItemDetailScreen = ({}) => {
               style={[styles.input, { justifyContent: 'center' }]}
               onPress={() => setClothingModalVisible(true)}
             >
-              <Text  style={{ color: clothingSelectedItem ? '#222' : '#666' }}>
-                { clothingSelectedItem
-                  ? `${clothingSelectedItem}`
+              <Text  style={{ color: type ? '#222' : '#666' }}>
+                { type
+                  ? `${type}`
                   : 'Select Type'}
               </Text>
             </TouchableOpacity>
