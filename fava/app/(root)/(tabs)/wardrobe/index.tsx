@@ -38,7 +38,7 @@ const itemCardData = [
 ];
 
 const WardrobeTabScreen = () => {
-  const { user, refreshUser } = useUser()
+  const { user, refreshUser } = useUser();
 
   const router = useRouter();
   const categories = ['All', 'Pants', 'T-shirt', 'Coat', 'Shoes', 'Hat'];
@@ -72,20 +72,28 @@ const WardrobeTabScreen = () => {
   //   fetchData();
   // }, [])
 
+  // useEffect(() => {
+  //   const f = async () => {
+  //     await refreshUser()
+  //   }
+
+  //   f();
+  // }, []);
+
   useEffect(() => {
-    refreshUser(); // Only triggers the update
-  }, []);
+    refreshUser()
+  }, [])
 
   useEffect(() => {
     if (user && user.clothes && user.clothes.length > 0) {
-      console.log("User clothes updated:", user.clothes);
+      console.log("User clothes updated:", user.clothes)
       console.log(
         "Purposes: ",
         encodeURIComponent(JSON.stringify(user.clothes[0].purposes))
       );
       setClothes(user.clothes);
     } else {
-      setClothes([]); 
+      setClothes([]);
     }
   }, [user]);
 

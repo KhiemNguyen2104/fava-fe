@@ -10,11 +10,17 @@ import CustomModal from '@/components/CustomModal';
 import SingleOptionPickerModal from '@/components/SingleOptionModal';
 import ScreenDivider from '@/components/ScreenDivider';
 import PurposePickerModal from '@/components/PurposePickerModal';
+import * as FileSystem from 'expo-file-system';
+import api from '@/ultils/axiosInstance';
+import { useUser } from '@/context/UserContext';
+import ImageWrapper from '@/components/ImageWrapper';
 
-const transparentBg = require('@/assets/images/transparent-bg.jpg'); 
-const SIZE = ['S', 'M', 'L', 'X','XL', 'XXL'];
+const transparentBg = require('@/assets/images/transparent-bg.jpg');
+const SIZE = ['S', 'M', 'L', 'X', 'XL', 'XXL'];
 
 export default function AddItem() {
+  const { user, refreshUser } = useUser()
+
   const [name, setName] = useState('');
   const [image, setImage] = useState<string | null>(null);
   const [type, setType] = useState('');
@@ -30,19 +36,58 @@ export default function AddItem() {
   const [clothingSelectedItem, setClothingSelectedItem] = useState<string | null>(null);
 
   const [purposeModalVisible, setPurposeModalVisible] = useState(false);
-  const [choosenPurpose, setChoosenPurpose] = useState('');
+  const [chosenPurpose, setChosenPurpose] = useState('');
 
   const [sizeModalVisible, setSizeModalVisible] = useState(false);
   const [sizeSelectedItem, setSizeSelectedItem] = useState<string | null>(null);
 
   const handleAddPurpose = (purposeArray: string[]) => {
-    setChoosenPurpose(purposeArray.join(', ')); 
+    setChosenPurpose(purposeArray.join(', '));
+  };
+
+  const convertImageToBuffer = async (image: string) => {
+    const isBase64Uri = (uri: string): boolean =>
+      typeof uri === 'string' && uri.startsWith('data:image/');
+
+    if (isBase64Uri(image)) {
+      return image;
+    } else if (image.startsWith('file')) {
+      try {
+        const base64 = await FileSystem.readAsStringAsync(image, {
+          encoding: FileSystem.EncodingType.Base64,
+        });
+        console.log("Base64 string:", base64);
+        return  `data:image/png;base64,${base64}`;
+      } catch (error) {
+        console.error("Error converting image to base64:", error);
+      }
+    } else {
+      console.log("IinURI:", encodeURIComponent(image))
+
+      const response = await api.get(`/clothes/image?${image}`, {
+        responseType: 'blob',
+      });
+
+      if (response.status !== 200) throw new Error('Failed to fetch image');
+
+      const blob = response.data as Blob;
+
+      return await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          const base64data = reader.result as string;
+          resolve(base64data);
+        };
+        reader.onerror = (err) => reject(err);
+        reader.readAsDataURL(blob);
+      });
+    }
   };
 
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ['images'],
-        quality: 1,
+      mediaTypes: ['images'],
+      quality: 1,
     });
 
     if (!result.canceled) {
@@ -61,17 +106,30 @@ export default function AddItem() {
     }
   };
 
-  const handleAddItem = () => {
-    console.log('Item added:', {
-      name,
-      image,
-      type,
-      label,
-      size,
-      temperatureFrom,
-      temperatureTo,
-      choosenPurpose,
-    });
+  const handleAddItem = async () => {
+    try {
+      const uri = await convertImageToBuffer(image);
+      const profile = {
+        name: name,
+        kind: type,
+        ...(temperatureFrom && { tempFloor: Number(temperatureFrom) }),
+        ...(temperatureTo && { tempRoof: Number(temperatureTo) }),
+        purposes: chosenPurpose.split(', ').sort(),
+        ...(label && { label: label }),
+        ...(size && { size: size })
+      }
+
+      const data = {
+        image: uri,
+        prof: JSON.stringify(profile)
+      }
+
+      const response = await api.post('/clothes', data)
+
+      console.log("Response: ", response.data)
+    } catch (error) {
+      console.error(error)
+    }
   }
 
   return (
@@ -82,17 +140,17 @@ export default function AddItem() {
           style={{ width: '100%', height: '100%', justifyContent: 'center', alignItems: 'center', borderRadius: 10 }}
           imageStyle={{ borderRadius: 10 }}
         >
-        {image ? (
-          <Image source={{ uri: image }} style={styles.image} />
-        ) : (
-          <Text style={styles.uploadText}>Upload the image</Text>
-        )}
+          {image ? (
+            <ImageWrapper image={image}></ImageWrapper>
+          ) : (
+            <Text style={styles.uploadText}>Upload the image</Text>
+          )}
 
-        <View style={styles.cameraButtons}>
+          <View style={styles.cameraButtons}>
             <TouchableOpacity onPress={takePhoto}>
               <Icon name="camera" size={24} color="white" />
             </TouchableOpacity>
-        </View>
+          </View>
 
         </ImageBackground>
       </TouchableOpacity>
@@ -103,67 +161,67 @@ export default function AddItem() {
         </TouchableOpacity>
       </View>
 
-      
-      <ScreenDivider  />  
-      
-      
+
+      <ScreenDivider />
+
+
       <TextInput style={styles.nameInput} placeholder="Name" value={name} onChangeText={setName} />
 
 
-      <View style={styles.form}>        
+      <View style={styles.form}>
         <View style={styles.inputRow}>
-            <Text style={styles.label}>Type:</Text>
-             <TouchableOpacity
-              style={[styles.input, { justifyContent: 'center' }]}
-              onPress={() => setClothingModalVisible(true)}
-            >
-              <Text  style={{ color: clothingSelectedItem ? '#222' : '#666' }}>
-                { clothingSelectedItem
-                  ? `${clothingSelectedItem}`
-                  : 'Select Type'}
-              </Text>
-            </TouchableOpacity>
+          <Text style={styles.label}>Type:</Text>
+          <TouchableOpacity
+            style={[styles.input, { justifyContent: 'center' }]}
+            onPress={() => setClothingModalVisible(true)}
+          >
+            <Text style={{ color: clothingSelectedItem ? '#222' : '#666' }}>
+              {clothingSelectedItem
+                ? `${clothingSelectedItem}`
+                : 'Select Type'}
+            </Text>
+          </TouchableOpacity>
         </View>
         {/* Modal for selecting clothing type */}
-          <SingleOptionPickerModal
-            visible={clothingModalVisible}
-            onSelect={(item) => {
-              setType(item);
-              setClothingSelectedItem(item);
-              setClothingModalVisible(false);
-            }}
-            onClose={() => setClothingModalVisible(false)}
-          />
+        <SingleOptionPickerModal
+          visible={clothingModalVisible}
+          onSelect={(item) => {
+            setType(item);
+            setClothingSelectedItem(item);
+            setClothingModalVisible(false);
+          }}
+          onClose={() => setClothingModalVisible(false)}
+        />
 
         <View style={styles.inputRow}>
-            <Text style={styles.label}>Label:</Text>
-            <TextInput style={styles.input} placeholder="Adidas, Nike, ..." value={label} onChangeText={setLabel} />
+          <Text style={styles.label}>Label:</Text>
+          <TextInput style={styles.input} placeholder="Adidas, Nike, ..." value={label} onChangeText={setLabel} />
         </View>
 
         <View style={styles.inputRow}>
-            <Text style={styles.label}>Size:</Text>
-            <TouchableOpacity
-              style={[styles.input, { justifyContent: 'center' }]}
-              onPress={() => setSizeModalVisible(true)}
-             >
-              <Text  style={{ color: sizeSelectedItem ? '#111' : '#666' }}>
-                { sizeSelectedItem
-                  ? `${sizeSelectedItem}`
-                  : 'Select Size'}
-              </Text>
-            </TouchableOpacity>        
+          <Text style={styles.label}>Size:</Text>
+          <TouchableOpacity
+            style={[styles.input, { justifyContent: 'center' }]}
+            onPress={() => setSizeModalVisible(true)}
+          >
+            <Text style={{ color: sizeSelectedItem ? '#111' : '#666' }}>
+              {sizeSelectedItem
+                ? `${sizeSelectedItem}`
+                : 'Select Size'}
+            </Text>
+          </TouchableOpacity>
         </View>
-          {/* Modal for selecting size */}
-          <SingleOptionPickerModal
-            data={SIZE}
-            visible={sizeModalVisible}
-            onSelect={(item) => {
-              setSize(item);
-              setSizeSelectedItem(item);
-              setSizeModalVisible(false);
-            }}
-            onClose={() => setSizeModalVisible(false)}
-          />
+        {/* Modal for selecting size */}
+        <SingleOptionPickerModal
+          data={SIZE}
+          visible={sizeModalVisible}
+          onSelect={(item) => {
+            setSize(item);
+            setSizeSelectedItem(item);
+            setSizeModalVisible(false);
+          }}
+          onClose={() => setSizeModalVisible(false)}
+        />
 
         <View style={styles.inputRow}>
           <Text style={styles.label}>Temperature:</Text>
@@ -171,7 +229,7 @@ export default function AddItem() {
             style={[styles.input, { justifyContent: 'center' }]}
             onPress={() => setTemperatureModalVisible(true)}
           >
-            <Text  style={{ color: (temperatureFrom && temperatureTo) ? '#222' : '#666' }}>
+            <Text style={{ color: (temperatureFrom && temperatureTo) ? '#222' : '#666' }}>
               {temperatureFrom && temperatureTo
                 ? `${temperatureFrom} - ${temperatureTo}`
                 : 'From - To'}
@@ -220,28 +278,28 @@ export default function AddItem() {
           ]}
         />
 
-        <View style={styles.inputRow}>         
+        <View style={styles.inputRow}>
           <Text style={styles.label}>Purpose:</Text>
           <TouchableOpacity
-              style={[styles.input, { justifyContent: 'center' }]}
-              onPress={() => setPurposeModalVisible(true)}
-             >
-              <Text  style={{ color: choosenPurpose ? '#111' : '#666' }}>
-                { choosenPurpose
-                  ? `${choosenPurpose}`
-                  : 'Work, Go out, Party,...'}
-              </Text>
-            </TouchableOpacity>
+            style={[styles.input, { justifyContent: 'center' }]}
+            onPress={() => setPurposeModalVisible(true)}
+          >
+            <Text style={{ color: chosenPurpose ? '#111' : '#666' }}>
+              {chosenPurpose
+                ? `${chosenPurpose}`
+                : 'Work, Go out, Party,...'}
+            </Text>
+          </TouchableOpacity>
         </View>
-          {/* Modal for selecting purpose */}
-          <PurposePickerModal
-                visible={purposeModalVisible}
-                onClose={() => setPurposeModalVisible(false)}
-                onSelect={handleAddPurpose}
-              />        
-                
+        {/* Modal for selecting purpose */}
+        <PurposePickerModal
+          visible={purposeModalVisible}
+          onClose={() => setPurposeModalVisible(false)}
+          onSelect={handleAddPurpose}
+        />
+
       </View>
-      
+
       <View style={styles.buttonRow}>
         <CircleBurron
           iconName="arrow-left"
@@ -258,16 +316,16 @@ export default function AddItem() {
           onPress={() => handleAddItem()}
         />
       </View>
-    </ScrollView> 
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { 
-    padding: 20, 
-    backgroundColor: 'white', 
+  container: {
+    padding: 20,
+    backgroundColor: 'white',
     flex: 1,
-},
+  },
   imageBox: {
     height: 250,
     width: 250,

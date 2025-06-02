@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Alert, View, Text, TextInput, Image, TouchableOpacity, StyleSheet, ImageBackground } from 'react-native';
+import { Alert, View, Text, TextInput, Image, TouchableOpacity, StyleSheet, ImageBackground, Platform } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import Icon from "react-native-vector-icons/FontAwesome6";
 import RectButton from '@/components/RectangleButton';
@@ -14,43 +14,54 @@ import { useLocalSearchParams } from 'expo-router';
 import ImageWrapper from '@/components/ImageWrapper';
 import api from '@/ultils/axiosInstance';
 import { AxiosResponse } from 'axios';
+import { useUser } from '@/context/UserContext';
+import * as FileSystem from 'expo-file-system';
 
 const transparentBg = require('@/assets/images/transparent-bg.jpg');
 const SIZE = ['S', 'M', 'L', 'X', 'XL', 'XXL'];
 
 
 const ItemDetailScreen = ({ }) => {
+  const { user, refreshUser } = useUser()
+
+
   const { parImage, parName, parKind, parLabel, parSize, parTempFloor, parTempRoof, parPurposes } = useLocalSearchParams();
   const tempImage = require('@/assets/images/placeholder_big.png');
 
   const [name, setName] = useState(
     Array.isArray(parName) ? parName[0] : parName || ''
   );
+  const [originName, setOriginName] = useState(
+    Array.isArray(parName) ? parName[0] : parName || ''
+  );
   const [image, setImage] = useState(parImage);
   const [newImage, setNewImage] = useState('');
+  console.log("I: ", parImage);
 
   // State variables for item details
   const [type, setType] = useState(parKind);
+  const [originType, setOriginType] = useState(parKind);
   const [label, setLabel] = useState(
     Array.isArray(parLabel) ? parLabel[0] : parLabel || ''
   );
+  const [originLabel, setOriginLabel] = useState(
+    Array.isArray(parLabel) ? parLabel[0] : parLabel || ''
+  );
   const [size, setSize] = useState(parSize || '');
+  const [originSize, setOriginSize] = useState(parSize || '');
 
   const [temperatureFrom, setTemperatureFrom] = useState(parTempFloor);
+  const [originTemperatureFrom, setOriginTemperatureFrom] = useState(parTempFloor);
   const [temperatureTo, setTemperatureTo] = useState(parTempRoof);
+  const [originTemperatureTo, setOriginTemperatureTo] = useState(parTempRoof);
   const [temperatureModalVisible, setTemperatureModalVisible] = useState(false);
 
   const [clothingModalVisible, setClothingModalVisible] = useState(false);
   const [clothingSelectedItem, setClothingSelectedItem] = useState<string | null>(null);
 
   const [purposeModalVisible, setPurposeModalVisible] = useState(false);
-  const [choosenPurpose, setChoosenPurpose] = useState(
-    typeof parPurposes === 'string'
-      ? parPurposes.split(',').sort().join(', ')
-      : Array.isArray(parPurposes)
-        ? parPurposes.sort().join(', ')
-        : ''
-  );
+  const [chosenPurpose, setChosenPurpose] = useState(parPurposes.split(',').sort().join(', '));
+  const [originChosenPurpose, setOriginChosenPurpose] = useState(parPurposes.split(',').sort().join(','));
 
   const [sizeModalVisible, setSizeModalVisible] = useState(false);
   const [sizeSelectedItem, setSizeSelectedItem] = useState<string | null>(
@@ -60,7 +71,46 @@ const ItemDetailScreen = ({ }) => {
   const router = useRouter();
 
   const handleAddPurpose = (purposeArray: string[]) => {
-    setChoosenPurpose(purposeArray.join(', '));
+    setChosenPurpose(purposeArray.join(', '));
+  };
+
+  const convertImageToBuffer = async (image: string) => {
+    const isBase64Uri = (uri: string): boolean =>
+      typeof uri === 'string' && uri.startsWith('data:image/');
+
+    if (isBase64Uri(image)) {
+      return image;
+    } else if (image.startsWith('file')) {
+      try {
+        const base64 = await FileSystem.readAsStringAsync(image, {
+          encoding: FileSystem.EncodingType.Base64,
+        });
+        console.log("Base64 string:", base64);
+        return `data:image/png;base64,${base64}`;
+      } catch (error) {
+        console.error("Error converting image to base64:", error);
+      }
+    } else {
+      console.log("IinURI:", encodeURIComponent(image))
+
+      const response = await api.get(`/clothes/image?${image}`, {
+        responseType: 'blob',
+      });
+
+      if (response.status !== 200) throw new Error('Failed to fetch image');
+
+      const blob = response.data as Blob;
+
+      return await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          const base64data = reader.result as string;
+          resolve(base64data);
+        };
+        reader.onerror = (err) => reject(err);
+        reader.readAsDataURL(blob);
+      });
+    }
   };
 
   const pickImage = async () => {
@@ -88,21 +138,22 @@ const ItemDetailScreen = ({ }) => {
   const handleRemoveConfirmed = async () => {
     try {
       const data = {
-        name: name,
-        kind: type,
-        purposes: choosenPurpose.split(',').sort(),
-        tempFloor: temperatureFrom,
-        tempRoof: temperatureTo,
-        ...(label && { label: label }),
-        ...(size && { size: size })
+        name: originName,
+        kind: originType,
+        purposes: originChosenPurpose.split(',').sort(),
+        tempFloor: Number(originTemperatureFrom),
+        tempRoof: Number(originTemperatureTo),
+        ...(originLabel && { label: originLabel }),
+        ...(originSize && { size: originSize })
       };
       console.log("Remove data: ", data);
 
       const response: AxiosResponse<{ message: string }, any> = await api.delete('/clothes', { data });
-      console.log(response.data.message);
+      console.log("Remove: ", response.data.message);
 
       console.log('Item removed');
-      router.back();
+      await refreshUser()
+      router.replace('/(root)/(tabs)/wardrobe');
     } catch (error) {
       console.error(error);
     }
@@ -128,7 +179,7 @@ const ItemDetailScreen = ({ }) => {
     );
   }
 
-  const handleSaveItem = () => {
+  const handleSaveItem = async () => {
     if (!name.trim()) {
       Alert.alert('Error', 'Please enter a name for the item.');
       return;
@@ -140,11 +191,53 @@ const ItemDetailScreen = ({ }) => {
     }
 
     // Logic to save the item goes here
-    console.log('Item saved:', { name, image, type, label, size, temperatureFrom, temperatureTo, choosenPurpose });
+    try {
+      const uri = await convertImageToBuffer(image)
+      console.log("Save Image: ", uri);
 
-    // Navigate back and show success message
-    Alert.alert('Success', 'Item saved successfully!');
-    router.back();
+      const data = {
+        name: originName,
+        kind: originType,
+        purposes: originChosenPurpose.split(',').sort(),
+        tempFloor: Number(originTemperatureFrom),
+        tempRoof: Number(originTemperatureTo),
+        ...(originLabel && { label: originLabel }),
+        ...(originSize && { size: originSize })
+      };
+      console.log("Remove data: ", data);
+
+      const response: AxiosResponse<{ message: string }, any> = await api.delete('/clothes', { data });
+      console.log("Remove: ", response.data.message);
+
+      const profile = {
+        name: name,
+        kind: type,
+        tempFloor: Number(temperatureFrom),
+        tempRoof: Number(temperatureTo),
+        purposes: chosenPurpose.split(', ').sort(),
+        ...(label && { label: label }),
+        ...(size && { size: size })
+      }
+
+      const sendData = {
+        image: uri,
+        prof: JSON.stringify(profile)
+      }
+
+      console.log("Save data: ", sendData);
+      const responseSave = await api.post('/clothes', sendData);
+
+      const d = await responseSave.data;
+      console.log('Success:', d);
+      console.log('Item saved:', { name, image, type, label, size, temperatureFrom, temperatureTo, chosenPurpose });
+
+      // Navigate back and show success message
+      Alert.alert('Success', 'Item saved successfully!');
+      await refreshUser()
+      router.replace('/(root)/(tabs)/wardrobe');
+    } catch (error) {
+      console.error("Save Error: ", error)
+    }
   }
 
   return (
@@ -295,9 +388,9 @@ const ItemDetailScreen = ({ }) => {
             style={[styles.input, { justifyContent: 'center' }]}
             onPress={() => setPurposeModalVisible(true)}
           >
-            <Text style={{ color: choosenPurpose ? '#111' : '#666' }}>
-              {choosenPurpose
-                ? `${choosenPurpose}`
+            <Text style={{ color: chosenPurpose ? '#111' : '#666' }}>
+              {chosenPurpose
+                ? `${chosenPurpose}`
                 : 'Work, Go out, Party,...'}
             </Text>
           </TouchableOpacity>

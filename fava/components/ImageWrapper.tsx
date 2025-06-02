@@ -25,6 +25,8 @@ const ImageWrapper: React.FC<ImageWrapperProps> = ({ image }) => {
                     console.log(image)
                     
                     setImageUri(image)
+                } else if (image.startsWith('file')) {
+                    setImageUri(image)
                 } else {
                     const response = await api.get(`/clothes/image?${image}`, { responseType: 'blob' })
 

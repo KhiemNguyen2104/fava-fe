@@ -99,8 +99,8 @@ export default function WeatherScreen() {
             key={index}
             height={200}
             width={80}
-            temperature={item.temp_c}
-            hour={item.time}
+            temperature={`${item.temp_c} ℃`}
+            hour={`${item.time}:00`}
             icon={item.condition.icon}
           />
         )) : (
@@ -115,7 +115,7 @@ export default function WeatherScreen() {
           buttonColor="#C2185B"
           width={50}
           height={50}
-          onPress={() => router.back()}
+          onPress={() => router.replace('/(root)/(tabs)/home')}
         />
       </View>
     </View>

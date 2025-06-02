@@ -11,6 +11,8 @@ type ItemCardProps = {
 };
 
 const ItemCard: React.FC<ItemCardProps> = ({ image, name, label, size, onPress }) => {
+  console.log(image)
+
   const [imageUri, setImageUri] = useState<string | null>(null);
   useEffect(() => {
     const loadImage = async () => {
@@ -28,7 +30,7 @@ const ItemCard: React.FC<ItemCardProps> = ({ image, name, label, size, onPress }
 
         reader.readAsDataURL(blob);
       } catch (error) {
-        console.error('Error loading image:', error);
+        console.error('Error loading image:' + image, error);
       }
     };
 
