@@ -1,10 +1,10 @@
 {
   "expo": {
-    "name": "fava",
-    "slug": "fava",
+    "name": "Fava",
+    "slug": "Fava",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/images/Fava.png",
     "scheme": "fava",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
@@ -36,10 +36,17 @@
     "experiments": {
       "typedRoutes": true
     },
+    "owner": "khiemnguyen2104",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/d67c860b-b3ce-4deb-996c-aee8b62905c3"
+    },
     "extra": {
       "router": {},
       "eas": {
-        "projectId": "3d0deb16-3fd6-4d43-a0f7-4ce17ddd7795"
+        "projectId": "d67c860b-b3ce-4deb-996c-aee8b62905c3"
       }
     }
   }

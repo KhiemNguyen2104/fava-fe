@@ -1,21 +1,34 @@
 {
   "build": {
     "preview": {
+      "distribution": "internal",
       "android": {
         "buildType": "apk"
-      }
+      },
+      "channel": "preview"
     },
     "preview2": {
+      "channel": "preview2",
       "android": {
         "gradleCommand": ":app:assembleRelease"
       }
     },
     "preview3": {
-      "developmentClient": true
+      "developmentClient": true,
+      "channel": "preview3"
     },
     "preview4": {
-      "distribution": "internal"
+      "distribution": "internal",
+      "channel": "preview4"
     },
-    "production": {}
+    "production": {
+      "channel": "production",
+      "env": {
+        "WEATHER_API_KEY": "fa6e21c13381417c9a6112427252305"
+      },
+      "android": {
+        "buildType": "apk"
+      }
+    }
   }
 }

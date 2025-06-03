@@ -8,6 +8,8 @@ import SingleOptionPickerModal from '@/components/SingleOptionModal';
 import ScreenDivider from '@/components/ScreenDivider';
 import ItemCard from '@/components/ItemCard';
 import PurposePickerModal from '@/components/PurposePickerModal';
+import api from '@/ultils/axiosInstance';
+import { useUser } from '@/context/UserContext';
 
 const itemCardData = [
   {
@@ -22,13 +24,13 @@ const itemCardData = [
     label: "",
     size: "L",
   },
-    {
+  {
     image: require('@/assets/images/placeholder_big.png'),
     name: "T1 Jacket Faker",
     label: "",
     size: "L",
   },
-    {
+  {
     image: require('@/assets/images/placeholder_big.png'),
     name: "T1 Jacket Faker",
     label: "",
@@ -36,14 +38,18 @@ const itemCardData = [
   },
 ];
 
-const SIZE = ['S', 'M', 'L', 'X','XL', 'XXL'];
+const SIZE = ['S', 'M', 'L', 'X', 'XL', 'XXL'];
 
 export default function AddItem() {
+  const { user, refreshUser } = useUser()
+
   const [type, setType] = useState('');
   const [label, setLabel] = useState('');
   const [size, setSize] = useState('');
-  const [choosenPurpose, setChoosenPurpose] = useState('');
+  const [chosenPurpose, setChosenPurpose] = useState('');
   const [isFullOutfit, setIsFullOutfit] = useState(false);
+
+  const [suggestionClothes, setSuggestionClothes] = useState<any[]>([])
 
   const [temperatureModalVisible, setTemperatureModalVisible] = useState(false);
   const [temperatureFrom, setTemperatureFrom] = useState('');
@@ -59,94 +65,125 @@ export default function AddItem() {
   const [purposes, setPurposes] = useState<string[]>([]);
 
   const handleAddPurpose = (purposeArray: string[]) => {
-    setPurposes(purposeArray);
-    setChoosenPurpose(purposeArray.join(', ')); 
+    const p = purposeArray.map((item) => String(convertPurpose(item))).sort()
+    setPurposes(p);
+    setChosenPurpose(p.join(', '));
   };
 
+  const convertPurpose = (p: string) => {
+    if (p == 'Work') return 'Work';
+    if (p == 'Party') return 'Party';
+    if (p == 'Go out') return 'GoOut';
+  }
+
   const router = useRouter();
-  
+
   const [showSuggestions, setShowSuggestions] = useState(false);
+
+  const getSuggestion = async () => {
+    try {
+
+
+      const url = `purposes=${encodeURIComponent(JSON.stringify(chosenPurpose.split(', ')))}`
+        + (type != '' ? `&kind=${encodeURIComponent(type)}` : '')
+        + (label != '' ? `&label=${encodeURIComponent(label)}` : '')
+        + (size != '' ? `&size=${encodeURIComponent(size)}` : '')
+        + (temperatureFrom != '' ? `&tempFloor=${encodeURIComponent(temperatureFrom)}` : '')
+        + (temperatureTo != '' ? `&tempRoof=${encodeURIComponent(temperatureTo)}` : '')
+
+      console.log("URL: ", url)
+
+      const response = await api.get(`/assistant?${url}`)
+
+      console.log("Clothes: ", response.data)
+
+      setSuggestionClothes(response.data)
+      setShowSuggestions(true)
+    } catch (error) {
+      console.error(error)
+    }
+  }
 
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-      
 
-      <View style={styles.form}>  
+
+      <View style={styles.form}>
         <Text style={styles.sectionTitle}>◆ Purpose</Text>
-        <View style={styles.inputRow}>         
+        <View style={styles.inputRow}>
           <Text style={styles.label}>Purpose:</Text>
           <TouchableOpacity
-              style={[styles.input, { justifyContent: 'center' }]}
-              onPress={() => setPurposeModalVisible(true)}
-             >
-              <Text  style={{ color: choosenPurpose ? '#111' : '#666' }}>
-                { choosenPurpose
-                  ? `${choosenPurpose}`
-                  : 'Work, Go out, Party,...'}
-              </Text>
-            </TouchableOpacity>
+            style={[styles.input, { justifyContent: 'center' }]}
+            onPress={() => setPurposeModalVisible(true)}
+          >
+            <Text style={{ color: chosenPurpose ? '#111' : '#666' }}>
+              {chosenPurpose
+                ? `${chosenPurpose}`
+                : 'Work, Go out, Party,...'}
+            </Text>
+          </TouchableOpacity>
         </View>
-          {/* Modal for selecting purpose */}
-          <PurposePickerModal
-                visible={purposeModalVisible}
-                onClose={() => setPurposeModalVisible(false)}
-                onSelect={handleAddPurpose}
-              />        
-        
+        {/* Modal for selecting purpose */}
+        <PurposePickerModal
+          visible={purposeModalVisible}
+          onClose={() => setPurposeModalVisible(false)}
+          onSelect={handleAddPurpose}
+        />
+
         <Text style={styles.sectionTitle}>◆ Other criteria</Text>
         <View style={styles.inputRow}>
-            <Text style={styles.label}>Type:</Text>
-             <TouchableOpacity
-              style={[styles.input, { justifyContent: 'center' }]}
-              onPress={() => setClothingModalVisible(true)}
-             >
-              <Text  style={{ color: clothingSelectedItem ? '#111' : '#666' }}>
-                { clothingSelectedItem
-                  ? `${clothingSelectedItem}`
-                  : 'Select Type'}
-              </Text>
-            </TouchableOpacity>
+          <Text style={styles.label}>Type:</Text>
+          <TouchableOpacity
+            style={[styles.input, { justifyContent: 'center' }]}
+            onPress={() => setClothingModalVisible(true)}
+          >
+            <Text style={{ color: clothingSelectedItem ? '#111' : '#666' }}>
+              {clothingSelectedItem
+                ? `${clothingSelectedItem}`
+                : 'Select Type'}
+            </Text>
+          </TouchableOpacity>
         </View>
         {/* Modal for selecting clothing type */}
-          <SingleOptionPickerModal
-            visible={clothingModalVisible}
-            onSelect={(item) => {
-              setType(item);
-              setClothingSelectedItem(item);
-              setClothingModalVisible(false);
-            }}
-            onClose={() => setClothingModalVisible(false)}
-          />
+        <SingleOptionPickerModal
+          visible={clothingModalVisible}
+          onSelect={(item) => {
+            setType(item);
+            setClothingSelectedItem(item);
+            setClothingModalVisible(false);
+          }}
+          onClose={() => setClothingModalVisible(false)}
+        />
 
         <View style={styles.inputRow}>
-            <Text style={styles.label}>Label:</Text>
-            <TextInput style={styles.input} placeholder="Adidas, Nike, ..." value={label} onChangeText={setLabel} />
+          <Text style={styles.label}>Label:</Text>
+          <TextInput style={styles.input} placeholder="Adidas, Nike, ..." value={label} onChangeText={setLabel} />
         </View>
 
         <View style={styles.inputRow}>
-            <Text style={styles.label}>Size:</Text>
-            <TouchableOpacity
-              style={[styles.input, { justifyContent: 'center' }]}
-              onPress={() => setSizeModalVisible(true)}
-             >
-              <Text  style={{ color: sizeSelectedItem ? '#111' : '#666' }}>
-                { sizeSelectedItem
-                  ? `${sizeSelectedItem}`
-                  : 'Select Size'}
-              </Text>
-            </TouchableOpacity>        
+          <Text style={styles.label}>Size:</Text>
+          <TouchableOpacity
+            style={[styles.input, { justifyContent: 'center' }]}
+            onPress={() => setSizeModalVisible(true)}
+          >
+            <Text style={{ color: sizeSelectedItem ? '#111' : '#666' }}>
+              {sizeSelectedItem
+                ? `${sizeSelectedItem}`
+                : 'Select Size'}
+            </Text>
+          </TouchableOpacity>
         </View>
-          {/* Modal for selecting size */}
-          <SingleOptionPickerModal
-            data={SIZE}
-            visible={sizeModalVisible}
-            onSelect={(item) => {
-              setSize(item);
-              setSizeSelectedItem(item);
-              setSizeModalVisible(false);
-            }}
-            onClose={() => setSizeModalVisible(false)}
-          />
+        {/* Modal for selecting size */}
+        <SingleOptionPickerModal
+          data={SIZE}
+          visible={sizeModalVisible}
+          onSelect={(item) => {
+            setSize(item);
+            setSizeSelectedItem(item);
+            setSizeModalVisible(false);
+          }}
+          onClose={() => setSizeModalVisible(false)}
+        />
 
         <View style={styles.inputRow}>
           <Text style={styles.label}>Temperature:</Text>
@@ -154,7 +191,7 @@ export default function AddItem() {
             style={[styles.input, { justifyContent: 'center' }]}
             onPress={() => setTemperatureModalVisible(true)}
           >
-            <Text  style={{ color: (temperatureFrom && temperatureTo) ? '#222' : '#666' }}>
+            <Text style={{ color: (temperatureFrom && temperatureTo) ? '#222' : '#666' }}>
               {temperatureFrom && temperatureTo
                 ? `${temperatureFrom} - ${temperatureTo}`
                 : 'From - To'}
@@ -212,16 +249,16 @@ export default function AddItem() {
           </TouchableOpacity>
           <Text style={styles.label}>Full outfit</Text>
         </View>
-                
+
       </View>
-      
+
       <View style={styles.submitButton}>
         <RectButton
           title="Submit"
           buttonColor="#C2185B"
           width={120}
           height={50}
-          onPress={() => setShowSuggestions(true)}
+          onPress={getSuggestion}
         />
       </View>
 
@@ -229,36 +266,54 @@ export default function AddItem() {
 
       {showSuggestions && (
         <ScrollView horizontal={false} showsVerticalScrollIndicator={false} contentContainerStyle={styles.suggestionContainer}>
-          {itemCardData.map((item, index) => (
+          {suggestionClothes.map((item, index) => (
             <ItemCard
               key={index}
-              image={item.image}
+              image={
+                `name=${encodeURIComponent(item.name)}` +
+                `&kind=${item.kind}` +
+                `&tempFloor=${item.tempFloor}` +
+                `&tempRoof=${item.tempRoof}` +
+                `&purposes=${encodeURIComponent(JSON.stringify(item.purposes))}` +
+                (item.label ? `&label=${encodeURIComponent(item.label)}` : '') +
+                (item.size ? `&size=${encodeURIComponent(item.size)}` : '')
+              }
               name={item.name}
               label={item.label}
               size={item.size}
               onPress={() => router.push({
                 pathname: '/(root)/(tabs)/wardrobe/detail',
                 params: {
-                  image: item.image,
-                  name: item.name,
-                  label: item.label,
-                  size: item.size,
+                  parImage: `name=${encodeURIComponent(item.name)}` +
+                    `&kind=${item.kind}` +
+                    `&tempFloor=${item.tempFloor}` +
+                    `&tempRoof=${item.tempRoof}` +
+                    `&purposes=${encodeURIComponent(JSON.stringify(item.purposes))}` +
+                    (item.label ? `&label=${encodeURIComponent(item.label)}` : '') +
+                    (item.size ? `&size=${encodeURIComponent(item.size)}` : ''),
+                  parName: item.name,
+                  parKind: item.kind,
+                  parLabel: item.label,
+                  parSize: item.size,
+                  parTempFloor: item.tempFloor,
+                  parTempRoof: item.tempRoof,
+                  parPurposes: item.purposes
                 },
               })}
             />
           ))}
         </ScrollView>
       )}
-    </ScrollView> 
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { 
-    padding: 20, 
-    backgroundColor: 'white', 
+  container: {
+    padding: 20,
+    backgroundColor: 'white',
     flex: 1,
-},
+  },
   imageBox: {
     height: 250,
     width: 250,
@@ -350,7 +405,7 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
     alignItems: 'flex-end',
   },
-   sectionTitle: {
+  sectionTitle: {
     fontWeight: 'bold',
     color: '#d10a6a',
     marginTop: 10,

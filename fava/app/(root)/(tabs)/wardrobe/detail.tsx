@@ -410,7 +410,7 @@ const ItemDetailScreen = ({ }) => {
           buttonColor="#C2185B"
           width={50}
           height={50}
-          onPress={() => router.back()}
+          onPress={() => router.replace('/(root)/(tabs)/wardrobe')}
         />
         <RectButton
           title="Save"

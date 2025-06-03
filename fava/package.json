@@ -45,7 +45,8 @@
     "react-native-system-navigation-bar": "^2.6.4",
     "react-native-vector-icons": "^10.2.0",
     "react-native-web": "~0.20.0",
-    "expo-file-system": "~18.1.10"
+    "expo-file-system": "~18.1.10",
+    "expo-updates": "~0.28.13"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",

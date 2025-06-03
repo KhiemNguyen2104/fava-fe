@@ -45,6 +45,12 @@ export default function AddItem() {
     setChosenPurpose(purposeArray.join(', '));
   };
 
+  const convertPurpose = (p: string) => {
+    if (p == 'Work') return 'Work';
+    if (p == 'Party') return 'Party';
+    if (p == 'Go out') return 'GoOut';
+  }
+
   const convertImageToBuffer = async (image: string) => {
     const isBase64Uri = (uri: string): boolean =>
       typeof uri === 'string' && uri.startsWith('data:image/');
@@ -114,7 +120,7 @@ export default function AddItem() {
         kind: type,
         ...(temperatureFrom && { tempFloor: Number(temperatureFrom) }),
         ...(temperatureTo && { tempRoof: Number(temperatureTo) }),
-        purposes: chosenPurpose.split(', ').sort(),
+        purposes: chosenPurpose.split(', ').map((item) => convertPurpose(item)).sort(),
         ...(label && { label: label }),
         ...(size && { size: size })
       }
@@ -127,6 +133,8 @@ export default function AddItem() {
       const response = await api.post('/clothes', data)
 
       console.log("Response: ", response.data)
+      await refreshUser()
+      router.replace('/(root)/(tabs)/wardrobe')
     } catch (error) {
       console.error(error)
     }

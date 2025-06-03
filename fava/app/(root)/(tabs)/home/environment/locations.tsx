@@ -66,7 +66,12 @@ const LocationsScreen = () => {
     }
   };
 
-  const handleDeleteCity = async () => {
+  useEffect(() => {
+    // This runs whenever `cities` changes
+    console.log("Cities updated", cities);
+  }, [cities]);
+
+  const handleDeleteCity = async (cityName: string) => {
     Alert.alert("Delete City", "Are you sure you want to delete this city?", [
       {
         text: "Cancel",
@@ -76,7 +81,9 @@ const LocationsScreen = () => {
         text: "OK",
         onPress: async () => {
           try {
-            const response = await api.delete(`/weather/city?name=${deleteCity}`)
+            const response = await api.delete(`/weather/city?name=${cityName}`)
+
+            setCities(prevCities => prevCities.filter(city => city !== cityName));
 
             await getAllCities()
             await getAllWeatherData()
@@ -134,7 +141,7 @@ const LocationsScreen = () => {
     <View style={{ flex: 1 }}>
       <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
         {weatherData.length > 0 ? weatherData.map(item => (
-          <TouchableOpacity key={item.city} onPress={async () => {await handleSelectCity(item.city)}}>
+          <TouchableOpacity key={item.city} onPress={async () => { await handleSelectCity(item.city) }} onLongPress={() => handleDeleteCity(item.city)}>
             <CityWeatherCard
               city={item.city}
               range={item.range}
